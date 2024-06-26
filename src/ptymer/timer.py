@@ -15,13 +15,13 @@ class Timer:
         time_str = f"{int(horas)} {int(mins)} {secs}"
         return datetime.strptime(time_str, "%H %M %S.%f").time()
         
-    def start(self, seconds: int | float | None = None) -> None:
+    def start(self) -> None:
         """
+        Starts the timer and sets the start time
         
         """
         self.__running = True
         self.__start_time = datetime.now()
-        self.__end_time = self.__start_time + timedelta(seconds=seconds) if seconds else None
     
     def stop(self, current_time: bool = False) -> datetime.time:
         """
