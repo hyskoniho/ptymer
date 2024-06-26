@@ -10,16 +10,18 @@ class Timer:
     
     @staticmethod
     def _time_format(secs: int | float) -> datetime.time:
+        """
+        Convert seconds to datetime.time
+        """
         mins, secs = divmod(secs, 60)
-        horas, mins = divmod(mins, 60)
+        hours, mins = divmod(mins, 60)
 
-        time_str = f"{int(horas)} {int(mins)} {secs}"
+        time_str = f"{int(hours)} {int(mins)} {secs}"
         return datetime.strptime(time_str, "%H %M %S.%f").time()
         
     def start(self) -> None:
         """
         Starts the timer and sets the start time
-        
         """
         if self.__running:
             raise RuntimeError(f"Timer already executing!")
@@ -29,8 +31,8 @@ class Timer:
     
     def stop(self, show: bool = False) -> str:
         """
-        Para o timer e pode retornar o tempo restante no seguinte 
-        formato: HH:MM:SS.ms
+        Stop the timer and sets the end time
+        It can show the endpoint and the list of marks
         """
         if not self.__running:
             raise AttributeError(f"There is no timer executing!")
@@ -39,12 +41,12 @@ class Timer:
             self.__end_time = self._time_format((datetime.now() - self.__start_time).total_seconds())
 
             print(f"Endpoint: {self.__end_time}") if show else None
-            [print(f"Mark {x+1}: {mark[0]}{(" \t '" + mark[1] + "'") if mark[1] != "" else ""}") for x, mark in enumerate(self._marks)] if show and len(self._marks) > 0 else None
+            [print(f"Mark {x+1}: {mark[0]}{(" \t '" + str(mark[1]) + "'") if mark[1] != "" else ""}") for x, mark in enumerate(self._marks)] if show and len(self._marks) > 0 else None
             return str(self.__end_time)
     
-    def _current_time(self) -> datetime.time:
+    def current_time(self) -> datetime.time:
         """
-        Exibe o tempo restante do timer no formato HH:MM:SS.ms
+        Return current time of the timer from the start time in datetime format
         """
         if not self.__running:
             raise AttributeError(f"There is no timer executing!")
@@ -53,13 +55,13 @@ class Timer:
     
     def mark(self, observ: None | str = None) -> None:
         """
-        Marca o tempo atual do timer
+        Create a mark with the current time and an observation (optional)
         """
-        self._marks.append([self._current_time(), f"{observ}" if observ else ""])
+        self._marks.append([self.current_time(), f"{observ}" if observ else ""])
 
     def list_marks(self):
         """
-        Retorna uma lista com os marcos do timer
+        Returns a dictionary with the marks and their respective times
         """
         if self._marks == []:
             raise AttributeError(f"There are no marks to show!")
@@ -69,7 +71,49 @@ class Timer:
         """
         Show the current time
         """
-        print(f"Current time: {(self._current_time())}")
+        print(f"Current time: {str(self.current_time())}")
+    
+    def restart(self):
+        """
+        Restart the timer
+        """
+        if not self.__running:
+            raise RuntimeError(f"There is no timer running!")
+        else:
+            self.__start_time = datetime.now()
+            self._marks = []
+
+class HourGlass():
+    def __init__(self):
+        self.__start_time: None = None
+        self.__running: bool = False
+    
 
 if __name__ == '__main__':
-    pass
+    timer = Timer()
+    timer2 = Timer()
+    timer.start()
+
+    sleep(3)
+
+    timer.mark("Primeiro marco")
+    sleep(0.1)
+    timer.mark()
+    timer2.start()
+    sleep(0.1)
+    timer.mark(" Segundo marco")
+    sleep(0.1)
+    timer.mark()
+    timer2.mark()
+    sleep(0.1)
+    print(timer.current_time())
+
+    sleep(3)
+    timer.mark("     Terceiro marco")
+    sleep(5)
+    timer.mark()
+    timer2.stop(True)
+    print(timer.list_marks())
+    sleep(1)
+
+    timer.stop(True)
