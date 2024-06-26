@@ -1,13 +1,30 @@
-# Suponha que esta seja a sua lista
-lista = [
-    ["item0_1", "item0_2"],
-    ["item1_1", "item1_2"],
-    ["item2_1", "item2_2"]
-]
+from timer import Timer
+from time import sleep
 
-# Criação do dicionário
-dicionario = {indice: (sublista[0], sublista[1]) for indice, sublista in enumerate(lista)}
+timer = Timer()
+timer2 = Timer()
+timer.start()
 
-print(dicionario)
+sleep(3)
 
+timer.mark("Primeiro marco")
+sleep(0.1)
+timer.mark()
+timer2.start()
+sleep(0.1)
+timer.mark(" Segundo marco")
+sleep(0.1)
+timer.mark()
+timer2.mark()
+sleep(0.1)
+print(timer.current_time())
 
+sleep(3)
+timer.mark("     Terceiro marco")
+sleep(5)
+timer.mark()
+timer2.stop(True)
+print(timer.list_marks())
+sleep(1)
+
+timer.stop(True)
