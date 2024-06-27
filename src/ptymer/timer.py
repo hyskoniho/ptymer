@@ -2,11 +2,14 @@ from datetime import datetime, timedelta
 from time import sleep
 
 class Timer:
-    def __init__(self):
+    def __init__(self) -> None:
         self.__start_time: datetime | None = None
         self.__end_time: datetime | None = None
         self._marks: list[list[str, ]] = []
         self.__running: bool = False
+    
+    def __str__(self) -> str:
+        return f"Class Timer()\nStatus: {self.__running}\nStart time: {str(self.__start_time)}\nTime since start: {str(self.current_time())}\nQuantity of marks: {len(self._marks)}\n"
     
     @staticmethod
     def _time_format(secs: int | float) -> datetime.time:
@@ -40,9 +43,20 @@ class Timer:
             self.__running = False
             self.__end_time = self._time_format((datetime.now() - self.__start_time).total_seconds())
 
-            print(f"Endpoint: {self.__end_time}") if show else None
-            [print(f"Mark {x+1}: {mark[0]}{(" \t '" + str(mark[1]) + "'") if mark[1] != "" else ""}") for x, mark in enumerate(self._marks)] if show and len(self._marks) > 0 else None
+            if show:
+                print(f"Endpoint: {self.__end_time}")
+                [print(f"Mark {x+1}: {mark[0]}{(" \t '" + str(mark[1]) + "'") if mark[1] != "" else ""}") for x, mark in enumerate(self._marks)] if len(self._marks) > 0 else None
             return str(self.__end_time)
+        
+    def restart(self) -> None:
+        """
+        Restart the timer, getting a new start time and cleaning the marks
+        """
+        if not self.__running:
+            raise RuntimeError(f"There is no timer running!")
+        else:
+            self.__start_time = datetime.now()
+            self._marks = []
     
     def current_time(self) -> datetime.time:
         """
@@ -59,7 +73,7 @@ class Timer:
         """
         self._marks.append([self.current_time(), f"{observ}" if observ else ""])
 
-    def list_marks(self):
+    def list_marks(self) -> None:
         """
         Returns a dictionary with the marks and their respective times
         """
@@ -67,53 +81,27 @@ class Timer:
             raise AttributeError(f"There are no marks to show!")
         return {idx: (sublist[0], sublist[1]) for idx, sublist in enumerate(self._marks)}
     
-    def show(self):
+    def show(self) -> None:
         """
-        Show the current time
+        Show the current time in str format (HH:MM:SS.ms)
         """
         print(f"Current time: {str(self.current_time())}")
-    
-    def restart(self):
-        """
-        Restart the timer
-        """
-        if not self.__running:
-            raise RuntimeError(f"There is no timer running!")
-        else:
-            self.__start_time = datetime.now()
-            self._marks = []
 
-class HourGlass():
-    def __init__(self):
-        self.__start_time: None = None
-        self.__running: bool = False
+
+
+# class HourGlass():
+#     def __init__(self):
+#         self.__start_time: None = None
+#         self.__running: bool = False
     
 
 if __name__ == '__main__':
     timer = Timer()
-    timer2 = Timer()
+    sleep(3)
     timer.start()
+    sleep(0.01)
+    print(timer)
 
-    sleep(3)
+    timer.show()
 
-    timer.mark("Primeiro marco")
-    sleep(0.1)
-    timer.mark()
-    timer2.start()
-    sleep(0.1)
-    timer.mark(" Segundo marco")
-    sleep(0.1)
-    timer.mark()
-    timer2.mark()
-    sleep(0.1)
-    print(timer.current_time())
-
-    sleep(3)
-    timer.mark("     Terceiro marco")
-    sleep(5)
-    timer.mark()
-    timer2.stop(True)
-    print(timer.list_marks())
-    sleep(1)
-
-    timer.stop(True)
+    sleep(10)
