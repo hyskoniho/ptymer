@@ -5,11 +5,11 @@ class Timer:
     def __init__(self) -> None:
         self.__start_time: datetime | None = None
         self.__end_time: datetime | None = None
-        self._marks: list[list[str, ]] = []
+        self.__marks: list[list[str, ]] = []
         self.__running: bool = False
     
     def __str__(self) -> str:
-        return f"Class Timer()\nStatus: {self.__running}\nStart time: {str(self.__start_time)}\nTime since start: {str(self.current_time())}\nQuantity of marks: {len(self._marks)}\n"
+        return f"Class Timer()\nStatus: {self.__running}\nStart time: {str(self.__start_time)}\nTime since start: {str(self.current_time())}\nQuantity of marks: {len(self.__marks)}\n"
     
     @staticmethod
     def _time_format(secs: int | float) -> datetime.time:
@@ -45,7 +45,7 @@ class Timer:
 
             if show:
                 print(f"Endpoint: {self.__end_time}")
-                [print(f"Mark {x+1}: {mark[0]}{(" \t '" + str(mark[1]) + "'") if mark[1] != "" else ""}") for x, mark in enumerate(self._marks)] if len(self._marks) > 0 else None
+                [print(f"Mark {x+1}: {mark[0]}{(" \t '" + str(mark[1]) + "'") if mark[1] != "" else ""}") for x, mark in enumerate(self.__marks)] if len(self.__marks) > 0 else None
             return str(self.__end_time)
         
     def restart(self) -> None:
@@ -56,7 +56,7 @@ class Timer:
             raise RuntimeError(f"There is no timer running!")
         else:
             self.__start_time = datetime.now()
-            self._marks = []
+            self.__marks = []
     
     def current_time(self) -> datetime.time:
         """
@@ -71,15 +71,15 @@ class Timer:
         """
         Create a mark with the current time and an observation (optional)
         """
-        self._marks.append([self.current_time(), f"{observ}" if observ else ""])
+        self.__marks.append([self.current_time(), observ if observ else ""])
 
     def list_marks(self) -> None:
         """
         Returns a dictionary with the marks and their respective times
         """
-        if self._marks == []:
+        if self.__marks == []:
             raise AttributeError(f"There are no marks to show!")
-        return {idx: (sublist[0], sublist[1]) for idx, sublist in enumerate(self._marks)}
+        return {idx: (sublist[0], sublist[1]) for idx, sublist in enumerate(self.__marks)}
     
     def show(self) -> None:
         """
