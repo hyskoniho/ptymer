@@ -27,11 +27,7 @@ class Timer:
         if self.__start_time:
             raise RuntimeError(f"Timer already executing!")
         else:
-            now = datetime.now()
-            self.__start_time = now
-
-            if self.__visibility:
-                print(f"Starting time: {str(now)}")
+            self.__start_time = datetime.now()
             
             return self.__start_time
     
@@ -47,8 +43,9 @@ class Timer:
             self.__start_time = None
 
             if self.__visibility:
-                print(f"Endtime: {str(end_time)}")
-                [print(f"Mark {x+1}: {mark[0]}{(" \t '" + str(mark[1]) + "'") if mark[1] != "" else ""}") for x, mark in enumerate(self.__marks)] if len(self.__marks) > 0 else None
+                print(f"\nEndtime: {str(end_time)}")
+                print("Marks:")
+                [print(f"{x+1}: {mark[0]}{(" \t '" + str(mark[1]) + "'") if mark[1] != "" else ""}") for x, mark in enumerate(self.__marks)] if len(self.__marks) > 0 else None
             
             return end_time
         
@@ -78,7 +75,12 @@ class Timer:
         """
         Create a mark with the current time and an observation (optional)
         """
-        self.__marks.append([self.current_time(), observ if observ else ""])
+        if not self.__start_time:
+            raise AttributeError(f"There is no timer executing!")
+        else:
+            if self.__visibility:
+                print(f"Mark {len(self.__marks)+1}: {str(self.current_time())}{(' \t ' + observ) if observ else ''}")
+            self.__marks.append([self.current_time(), observ if observ else ""])
 
     def list_marks(self) -> None:
         """
@@ -96,7 +98,7 @@ class Timer:
 
 
 
-# class HourGlass():
+# class HourGlass:
 #     def __init__(self):
 #         self.__start_time: None = None
 #         self.__running: bool = False
@@ -113,5 +115,4 @@ if __name__ == '__main__':
     t.mark("Second mark")
     sleep(1)
     t.stop()
-    t.mark("Third mark")
     pass
