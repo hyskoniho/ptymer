@@ -1,4 +1,7 @@
 from datetime import datetime
+from multiprocessing import Process, freeze_support, Value
+from time import sleep
+import psutil
 
 class Timer:
     def __init__(self, visibility: bool = False) -> None:
@@ -38,7 +41,7 @@ class Timer:
         mins, secs = divmod(secs, 60)
         hours, mins = divmod(mins, 60)
 
-        time_str = f"{int(hours)} {int(mins)} {secs}"
+        time_str = f"{int(hours)} {int(mins)} {float(secs)}"
         return datetime.strptime(time_str, "%H %M %S.%f").time()
         
     def start(self) -> datetime.time:
@@ -121,10 +124,11 @@ class Timer:
 
 
 class HourGlass:
-    def __init__(self, seconds: int | float = 60) -> None:
-        self.__total_time: datetime.time | None = self._time_format(seconds)
-        
-        self.__pid: int = None
+    def __init__(self, seconds: int | float = 60, visibility: bool = False) -> None:
+        freeze_support()
+        self.__visibility: bool = visibility
+        self.__total_time = Value('i', seconds, lock=False)
+        self.__pid: int | None = None
     
     @staticmethod
     def _time_format(secs: int | float) -> datetime.time:
@@ -134,18 +138,52 @@ class HourGlass:
         mins, secs = divmod(secs, 60)
         hours, mins = divmod(mins, 60)
 
-        time_str = f"{int(hours)} {int(mins)} {secs}"
+        time_str = f"{int(hours)} {int(mins)} {float(secs)}"
         return datetime.strptime(time_str, "%H %M %S.%f").time()
+    
+    def _decrease_time(self) -> None:
+        """
+        Decrease the time in 1 second
+        """
+        while self.__total_time.value > 0:
+            self.__total_time.value-=1
+            sleep(1)
+        print("Time is up!")
+    
+    def start(self) -> int:
+        """
+        Start the hourglass and return the process id
+        """
+        if self.__pid:
+            raise RuntimeError(f"Hourglass already running!")
+        else:
+            process = Process(target=self._decrease_time)
+            process.start()
+            self.__pid = process.pid
+
+            return self.__pid
+    
+    def show(self) -> None:
+        """
+        Show the remaining time in str format (HH:MM:SS.ms)
+        """
+        print(f"Remaining time: {str(self._time_format(self.__total_time.value))}")
     
 
 
 if __name__ == '__main__':
-    from time import sleep
-    with Timer(visibility=True) as t:
-        sleep(1)
-        t.mark("First mark")
-        sleep(1)
-        t.mark("Second mark")
-        sleep(1)
-        t.mark("Third mark")
-        sleep(1)
+    a = HourGlass(16)
+    init = datetime.now()
+    pid = a.start()
+    sleep(1)
+    a.show()
+    sleep(3)
+    a.show()
+    while psutil.pid_exists(pid):
+        sleep(0.01)
+        pass
+    fim = datetime.now()
+    print(fim - init)
+
+    print('End')
+    pass
