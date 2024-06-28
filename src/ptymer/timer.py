@@ -1,14 +1,13 @@
 from datetime import datetime
 
 class Timer:
-    def __init__(self) -> None:
+    def __init__(self, visibility: bool = False) -> None:
         self.__start_time: datetime | None = None
-        self.__end_time: datetime | None = None
         self.__marks: list[list[str, ]] = []
-        self.__running: bool = False
+        self.__visibility: bool = visibility
     
     def __str__(self) -> str:
-        return f"Class Timer()\nStatus: {self.__running}\nStart time: {str(self.__start_time)}\nTime since start: {str(self.current_time())}\nQuantity of marks: {len(self.__marks)}\n"
+        return f"Class Timer()\nVisibility: {self.__visibility}\nStatus: {self.__running}\nStart time: {str(self.__start_time)}\nTime since start: {str(self.current_time())}\nQuantity of marks: {len(self.__marks)}\n"
     
     @staticmethod
     def _time_format(secs: int | float) -> datetime.time:
@@ -21,47 +20,56 @@ class Timer:
         time_str = f"{int(hours)} {int(mins)} {secs}"
         return datetime.strptime(time_str, "%H %M %S.%f").time()
         
-    def start(self) -> None:
+    def start(self) -> datetime.time:
         """
         Starts the timer and sets the start time
         """
-        if self.__running:
+        if self.__start_time:
             raise RuntimeError(f"Timer already executing!")
         else:
-            self.__running = True 
-            self.__start_time = datetime.now()
+            now = datetime.now()
+            self.__start_time = now
+
+            if self.__visibility:
+                print(f"Starting time: {str(now)}")
+            
+            return self.__start_time
     
-    def stop(self, show: bool = False) -> str:
+    def stop(self) -> datetime.time:
         """
         Stop the timer and sets the end time
         It can show the endpoint and the list of marks
         """
-        if not self.__running:
+        if not self.__start_time:
             raise AttributeError(f"There is no timer executing!")
         else:
-            self.__running = False
-            self.__end_time = self._time_format((datetime.now() - self.__start_time).total_seconds())
+            end_time = self._time_format((datetime.now() - self.__start_time).total_seconds())
+            self.__start_time = None
 
-            if show:
-                print(f"Endpoint: {self.__end_time}")
+            if self.__visibility:
+                print(f"Endtime: {str(end_time)}")
                 [print(f"Mark {x+1}: {mark[0]}{(" \t '" + str(mark[1]) + "'") if mark[1] != "" else ""}") for x, mark in enumerate(self.__marks)] if len(self.__marks) > 0 else None
-            return str(self.__end_time)
+            
+            return end_time
         
     def restart(self) -> None:
         """
         Restart the timer, getting a new start time and cleaning the marks
         """
-        if not self.__running:
+        if not self.__start_time:
             raise RuntimeError(f"There is no timer running!")
         else:
-            self.__start_time = datetime.now()
+            now = datetime.now()
+            if self.__visibility:
+                print(f"Restarting point: {now}")
+            self.__start_time = now
             self.__marks = []
     
     def current_time(self) -> datetime.time:
         """
         Return current time of the timer from the start time in datetime format
         """
-        if not self.__running:
+        if not self.__start_time:
             raise AttributeError(f"There is no timer executing!")
         else:
             return self._time_format((datetime.now() - self.__start_time).total_seconds())
@@ -96,4 +104,14 @@ class Timer:
 
 
 if __name__ == '__main__':
+    from time import sleep
+    t = Timer(visibility=True)
+    t.start()
+    sleep(1)
+    t.mark("First mark")
+    sleep(1)
+    t.mark("Second mark")
+    sleep(1)
+    t.stop()
+    t.mark("Third mark")
     pass
