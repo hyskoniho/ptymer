@@ -1,5 +1,4 @@
-from datetime import datetime, timedelta
-from time import sleep
+from datetime import datetime
 
 class Timer:
     def __init__(self) -> None:
@@ -95,13 +94,6 @@ class Timer:
 #         self.__running: bool = False
     
 
+
 if __name__ == '__main__':
-    timer = Timer()
-    sleep(3)
-    timer.start()
-    sleep(0.01)
-    print(timer)
-
-    timer.show()
-
-    sleep(10)
+    pass
