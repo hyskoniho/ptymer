@@ -9,6 +9,27 @@ class Timer:
     def __str__(self) -> str:
         return f"Class Timer()\nVisibility: {self.__visibility}\nStatus: {self.__running}\nStart time: {str(self.__start_time)}\nTime since start: {str(self.current_time())}\nQuantity of marks: {len(self.__marks)}\n"
     
+    def __enter__(self) -> "Timer":
+        """
+        Start a new timer as a context manager.
+        """
+        if self.__start_time:
+            raise RuntimeError(f"Timer already executing!")
+        else:
+            self.start()
+        return self
+
+    def __exit__(self, exc_type: None | Exception, exc_value: None | str, traceback: str) -> None:
+        """
+        Stop the context manager timer.
+        """
+        if not self.__start_time:
+            raise AttributeError(f"There is no timer executing!")
+        elif exc_type:
+            raise exc_type(exc_value)
+        else:
+            self.stop()
+
     @staticmethod
     def _time_format(secs: int | float) -> datetime.time:
         """
@@ -97,32 +118,24 @@ class Timer:
         """
         print(f"Current time: {str(self.current_time())}")
 
-    def __enter__(self) -> "Timer":
-        """
-        Start a new timer as a context manager.
-        """
-        if self.__start_time:
-            raise RuntimeError(f"Timer already executing!")
-        else:
-            self.start()
-        return self
-
-    def __exit__(self, exc_type: None | Exception, exc_value: None | str, traceback: str) -> None:
-        """
-        Stop the context manager timer.
-        """
-        if not self.__start_time:
-            raise AttributeError(f"There is no timer executing!")
-        elif exc_type:
-            raise exc_type(exc_value)
-        else:
-            self.stop()
 
 
-# class HourGlass:
-#     def __init__(self):
-#         self.__start_time: None = None
-#         self.__running: bool = False
+class HourGlass:
+    def __init__(self, seconds: int | float = 60) -> None:
+        self.__total_time: datetime.time | None = self._time_format(seconds)
+        
+        self.__pid: int = None
+    
+    @staticmethod
+    def _time_format(secs: int | float) -> datetime.time:
+        """
+        Convert seconds to datetime.time
+        """
+        mins, secs = divmod(secs, 60)
+        hours, mins = divmod(mins, 60)
+
+        time_str = f"{int(hours)} {int(mins)} {secs}"
+        return datetime.strptime(time_str, "%H %M %S.%f").time()
     
 
 
