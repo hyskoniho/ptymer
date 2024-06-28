@@ -44,8 +44,9 @@ class Timer:
 
             if self.__visibility:
                 print(f"\nEndtime: {str(end_time)}")
-                print("Marks:")
-                [print(f"{x+1}: {mark[0]}{(" \t '" + str(mark[1]) + "'") if mark[1] != "" else ""}") for x, mark in enumerate(self.__marks)] if len(self.__marks) > 0 else None
+                if len(self.__marks) > 0:
+                    print("Marks:")
+                    [print(f"{x+1}: {mark[0]}{(" \t '" + str(mark[1]) + "'") if mark[1] != "" else ""}") for x, mark in enumerate(self.__marks)]
             
             return end_time
         
@@ -96,6 +97,26 @@ class Timer:
         """
         print(f"Current time: {str(self.current_time())}")
 
+    def __enter__(self) -> "Timer":
+        """
+        Start a new timer as a context manager.
+        """
+        if self.__start_time:
+            raise RuntimeError(f"Timer already executing!")
+        else:
+            self.start()
+        return self
+
+    def __exit__(self, exc_type: None | Exception, exc_value: None | str, traceback: str) -> None:
+        """
+        Stop the context manager timer.
+        """
+        if not self.__start_time:
+            raise AttributeError(f"There is no timer executing!")
+        elif exc_type:
+            raise exc_type(exc_value)
+        else:
+            self.stop()
 
 
 # class HourGlass:
@@ -107,12 +128,11 @@ class Timer:
 
 if __name__ == '__main__':
     from time import sleep
-    t = Timer(visibility=True)
-    t.start()
-    sleep(1)
-    t.mark("First mark")
-    sleep(1)
-    t.mark("Second mark")
-    sleep(1)
-    t.stop()
-    pass
+    with Timer(visibility=True) as t:
+        sleep(1)
+        t.mark("First mark")
+        sleep(1)
+        t.mark("Second mark")
+        sleep(1)
+        t.mark("Third mark")
+        sleep(1)
