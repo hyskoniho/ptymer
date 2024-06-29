@@ -1,7 +1,13 @@
 from datetime import datetime
 from multiprocessing import Process, freeze_support, Value
 from time import sleep
-from psutil import pid_exists
+from psutil import Process as psProcess
+
+def raise_timeout(*args) -> None:
+    """
+    Raise a TimeoutError
+    """
+    raise TimeoutError("Timeout reached!")
 
 class Timer:
     def __init__(self, visibility: bool = False) -> None:
@@ -124,13 +130,34 @@ class Timer:
 
 
 class HourGlass:
-    def __init__(self, seconds: int | float, end_function, *args, visibility: bool = False) -> None:
+    def __init__(self, seconds: int | float, target: any = raise_timeout, args: tuple | None = (), visibility: bool = False) -> None:
         freeze_support()
         self.__visibility: bool = visibility
         self.__total_time = Value('i', seconds, lock=False)
         self.__pid: int | None = None
-        self.__func = end_function
+        self.__func = target
         self.__args = args
+
+    def __enter__(self) -> "HourGlass":
+        """
+        Start a new hourglass as a context manager.
+        """
+        if self.__pid:
+            raise RuntimeError(f"Hourglass already executing!")
+        else:
+            self.start()
+        return self
+
+    def __exit__(self, exc_type: None | Exception, exc_value: None | str, traceback: str) -> None:
+        """
+        Stop the context manager hourglass.
+        """
+        if not self.__start_time:
+            raise AttributeError(f"There is no hourglass executing!")
+        elif exc_type:
+            raise exc_type(exc_value)
+        else:
+            self.stop()
     
     @staticmethod
     def _time_format(secs: int | float) -> datetime.time:
@@ -139,7 +166,7 @@ class HourGlass:
         """
         mins, secs = divmod(secs, 60)
         hours, mins = divmod(mins, 60)
-
+ 
         time_str = f"{int(hours)} {int(mins)} {float(secs)}"
         return datetime.strptime(time_str, "%H %M %S.%f").time()
     
@@ -156,7 +183,6 @@ class HourGlass:
         When it ends, it runs the chosen function
         It also interrupts main executin though the mainPid
         """
-        from psutil import Process as psProcess
         process = psProcess(mainPid)
 
         while self.__total_time.value > 0:
@@ -182,6 +208,19 @@ class HourGlass:
             self.__pid = process.pid
 
             return self.__pid
+        
+    def stop(self) -> None:
+        """
+        Stop the hourglass
+        """
+        if not self.__pid:
+            raise AttributeError(f"There is no hourglass running!")
+        else:
+            process = psProcess(self.__pid)
+            process.terminate()
+            self.__pid = None
+            if self.__visibility:
+                print("Hourglass stopped!")
     
     def show(self) -> None:
         """
@@ -192,9 +231,10 @@ class HourGlass:
 
 
 if __name__ == '__main__':
-    a = HourGlass(5, print, ["AAAAAAAAA\n\n\n\n" for x in range(0,100000)], visibility=True)
+    # a = HourGlass(5, print, args=("a", "b",), visibility=True)
+    a = HourGlass(5, visibility=True)
     a.start()
     sleep(1)
     while True:
-        print("Main process running")
+        pass
     pass
