@@ -1,7 +1,7 @@
 from datetime import datetime
 from multiprocessing import Process, freeze_support, Value
 from time import sleep
-import psutil
+from psutil import pid_exists
 
 class Timer:
     def __init__(self, visibility: bool = False) -> None:
@@ -124,11 +124,13 @@ class Timer:
 
 
 class HourGlass:
-    def __init__(self, seconds: int | float = 60, visibility: bool = False) -> None:
+    def __init__(self, seconds: int | float, end_function, *args, visibility: bool = False) -> None:
         freeze_support()
         self.__visibility: bool = visibility
         self.__total_time = Value('i', seconds, lock=False)
         self.__pid: int | None = None
+        self.__func = end_function
+        self.__args = args
     
     @staticmethod
     def _time_format(secs: int | float) -> datetime.time:
@@ -141,23 +143,41 @@ class HourGlass:
         time_str = f"{int(hours)} {int(mins)} {float(secs)}"
         return datetime.strptime(time_str, "%H %M %S.%f").time()
     
-    def _decrease_time(self) -> None:
+    @staticmethod
+    def run_function(func, *args) -> any:
+        """
+        Run a function with arguments
+        """
+        return func(*args)
+    
+    def _decrease_time(self, mainPid: int) -> None:
         """
         Decrease the time in 1 second
+        When it ends, it runs the chosen function
+        It also interrupts main executin though the mainPid
         """
+        from psutil import Process as psProcess
+        process = psProcess(mainPid)
+
         while self.__total_time.value > 0:
             self.__total_time.value-=1
             sleep(1)
-        print("Time is up!")
+        print("Time is up!") if self.__visibility else None
+        
+        process.suspend()
+        self.run_function(self.__func, *self.__args)
+        process.resume()
     
     def start(self) -> int:
         """
         Start the hourglass and return the process id
         """
+        from os import getpid
+
         if self.__pid:
             raise RuntimeError(f"Hourglass already running!")
         else:
-            process = Process(target=self._decrease_time)
+            process = Process(target=self._decrease_time, args=(getpid(),))
             process.start()
             self.__pid = process.pid
 
@@ -172,18 +192,9 @@ class HourGlass:
 
 
 if __name__ == '__main__':
-    a = HourGlass(16)
-    init = datetime.now()
-    pid = a.start()
+    a = HourGlass(5, print, ["AAAAAAAAA\n\n\n\n" for x in range(0,100000)], visibility=True)
+    a.start()
     sleep(1)
-    a.show()
-    sleep(3)
-    a.show()
-    while psutil.pid_exists(pid):
-        sleep(0.01)
-        pass
-    fim = datetime.now()
-    print(fim - init)
-
-    print('End')
+    while True:
+        print("Main process running")
     pass
