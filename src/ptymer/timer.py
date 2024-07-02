@@ -32,6 +32,24 @@ class Timer:
             raise exc_type(exc_value)
         else:
             self.stop()
+        
+    def __eq__(self, other: "Timer") -> bool:
+        return self.__start_time == other.__start_time
+
+    def __ne__(self, other: "Timer") -> bool:
+        return self.__start_time != other.__start_time
+    
+    def __lt__(self, other: "Timer") -> bool:
+        return self.__start_time < other.__start_time
+    
+    def __le__(self, other: "Timer") -> bool:
+        return self.__start_time <= other.__start_time
+    
+    def __gt__(self, other: "Timer") -> bool:
+        return self.__start_time > other.__start_time
+    
+    def __ge__(self, other: "Timer") -> bool:
+        return self.__start_time >= other.__start_time
 
     @staticmethod
     def _time_format(secs: int | float) -> datetime.time:
@@ -151,6 +169,28 @@ class HourGlass:
 
         self.__persist: bool = persist
         # If True, the secondary process will not be interrupted when the main process is interrupted
+
+    def __str__(self) -> str:
+        return f"Class HourGlass()\nVisibility: {self.__visibility}\nRemaining time: {self.__total_time.value}\nProcess id: {self.__pid}\nFunction: {self.__func}\nArguments: {self.__args}\nPersist: {self.__persist}\n"
+    
+    def __eq__(self, other: "HourGlass") -> bool:
+        return self.__total_time.value == other.__total_time.value
+    
+    def __ne__(self, other: "HourGlass") -> bool:
+        return self.__total_time.value != other.__total_time.value
+    
+    def __lt__(self, other: "HourGlass") -> bool:
+        return self.__total_time.value < other.__total_time.value
+    
+    def __le__(self, other: "HourGlass") -> bool:
+        return self.__total_time.value <= other.__total_time.value
+    
+    def __gt__(self, other: "HourGlass") -> bool:
+        return self.__total_time.value > other.__total_time.value
+    
+    def __ge__(self, other: "HourGlass") -> bool:
+        return self.__total_time.value >= other.__total_time.value
+    
     
     @staticmethod
     def _time_format(secs: int | float) -> datetime.time:
@@ -253,12 +293,9 @@ class HourGlass:
 
 
 if __name__ == '__main__':
-    # a = HourGlass(5, print, args=("a", "b",), visibility=True)
-    # a = HourGlass(5, print, visibility=True)
-    # a.start()
     from time import sleep
-    a = HourGlass(15, target=print, args=("a", "b",), visibility=True, persist=False).start()
-    sleep(1)
-    sleep(3)
-    a.show()
-    exit()
+    a = Timer(visibility=True).start()
+    # sleep(1)
+    b = Timer(visibility=True).start()
+
+    print(a == b)
