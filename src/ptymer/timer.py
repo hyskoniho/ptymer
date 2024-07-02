@@ -1,7 +1,6 @@
 from datetime import datetime
 from multiprocessing import Process, freeze_support, Value
-from time import sleep
-from psutil import Process as psProcess, pid_exists
+from psutil import Process as psProcess
 from typing import Callable
 
 class Timer:
@@ -132,13 +131,26 @@ class HourGlass:
                  visibility: bool = False,
                  persist: bool = False) -> None:
         freeze_support()
+        # Freeze support for Windows
+
         self.__visibility: bool = visibility
+        # Defines if the hourglass will show messages or not
+
         if seconds > 0: self.__total_time = Value('i', seconds, lock=False)
         else: raise ValueError(f"Seconds must be greater than 0!")
+        # Total time of the hourglass
+
         self.__pid: int | None = None
+        # Process id of the hourglass
+
         self.__func: Callable = target
+        # Function to be executed when time is up
+
         self.__args: tuple = args
+        # Arguments of the function
+
         self.__persist: bool = persist
+        # If True, the secondary process will not be interrupted when the main process is interrupted
     
     @staticmethod
     def _time_format(secs: int | float) -> datetime.time:
@@ -169,8 +181,10 @@ class HourGlass:
         When it ends, it runs the chosen function
         It also interrupts main executin though the mainPid
         """
+        from time import sleep
+        from psutil import pid_exists
+
         process = psProcess(mainPid)
-        # Get main process object
 
         try:
             while self.__total_time.value > 0 and (pid_exists(mainPid) or self.__persist):
@@ -178,10 +192,8 @@ class HourGlass:
                 sleep(1)
             # Decrease time in 1 second and sleep for 1 second (main 
             # process is not interrupted)
-            if pid_exists(mainPid):
-                print("Time is up!") if self.__visibility else None
-            else:
-                print("Main process interrupted!") if self.__visibility else None
+
+            print("Time is up!" if pid_exists(mainPid) else "Main process interrupted!") if self.__visibility else None 
             
             process.suspend()
             self.run_function(self.__func, *self.__args)
@@ -191,7 +203,7 @@ class HourGlass:
         except:
             pass
     
-    def start(self) -> int:
+    def start(self) -> "HourGlass":
         """
         Start the hourglass and return the self object
         """
@@ -205,6 +217,7 @@ class HourGlass:
             process = Process(target=self._decrease_time, args=(getpid(),))
             process.start()
             # Start the parallel process
+
             self.__pid = process.pid
 
             return self
@@ -235,7 +248,7 @@ class HourGlass:
         if not self.__pid:
             raise AttributeError(f"There is no hourglass running!")
         else:
-            return self.__pid
+            return int(self.__pid)
     
 
 
@@ -243,7 +256,8 @@ if __name__ == '__main__':
     # a = HourGlass(5, print, args=("a", "b",), visibility=True)
     # a = HourGlass(5, print, visibility=True)
     # a.start()
-    a = HourGlass(150, target=print, args=("a", "b",), visibility=True, persist=False).start()
+    from time import sleep
+    a = HourGlass(15, target=print, args=("a", "b",), visibility=True, persist=False).start()
     sleep(1)
     sleep(3)
     a.show()
