@@ -156,7 +156,12 @@ class HourGlass:
         """
         Run a function with arguments
         """
-        return func(*args)
+        try:
+            value = func(*args)
+        except:
+            pass
+        else:
+            return value
     
     def _decrease_time(self, mainPid: int) -> None:
         """
