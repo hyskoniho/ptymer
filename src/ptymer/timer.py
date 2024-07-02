@@ -53,7 +53,7 @@ class Timer:
         else:
             self.__start_time = datetime.now()
             
-            return self.__start_time
+            return self
     
     def stop(self) -> datetime.time:
         """
