@@ -203,6 +203,11 @@ class HourGlass:
         if isinstance(other, HourGlass):
             return self.__total_time.value >= other.__total_time.value
     
+    def __call__(self, seconds: int | float) -> "HourGlass":
+        self.__total_time.value = seconds
+        # Change the total time of the hourglass
+
+        return self
     
     @staticmethod
     def _time_format(secs: int | float) -> datetime.time:
@@ -306,8 +311,9 @@ class HourGlass:
 
 if __name__ == '__main__':
     from time import sleep
-    a = Timer(visibility=True).start()
-    # sleep(1)
-    b = Timer(visibility=True).start()
+    a = HourGlass(300).start()
 
-    print(a == b)
+    a(10).show()
+    a.show()
+    sleep(8)
+    a.show()
