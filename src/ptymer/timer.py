@@ -34,22 +34,28 @@ class Timer:
             self.stop()
         
     def __eq__(self, other: "Timer") -> bool:
-        return self.__start_time == other.__start_time
+        if isinstance(other, Timer):
+            return self.__start_time == other.__start_time
 
     def __ne__(self, other: "Timer") -> bool:
-        return self.__start_time != other.__start_time
+        if isinstance(other, Timer):
+            return self.__start_time != other.__start_time
     
     def __lt__(self, other: "Timer") -> bool:
-        return self.__start_time < other.__start_time
+        if isinstance(other, Timer):
+            return self.__start_time < other.__start_time
     
     def __le__(self, other: "Timer") -> bool:
-        return self.__start_time <= other.__start_time
+        if isinstance(other, Timer):
+            return self.__start_time <= other.__start_time
     
     def __gt__(self, other: "Timer") -> bool:
-        return self.__start_time > other.__start_time
+        if isinstance(other, Timer):
+            return self.__start_time > other.__start_time
     
     def __ge__(self, other: "Timer") -> bool:
-        return self.__start_time >= other.__start_time
+        if isinstance(other, Timer):
+            return self.__start_time >= other.__start_time
 
     @staticmethod
     def _time_format(secs: int | float) -> datetime.time:
@@ -174,22 +180,28 @@ class HourGlass:
         return f"Class HourGlass()\nVisibility: {self.__visibility}\nRemaining time: {self.__total_time.value}\nProcess id: {self.__pid}\nFunction: {self.__func}\nArguments: {self.__args}\nPersist: {self.__persist}\n"
     
     def __eq__(self, other: "HourGlass") -> bool:
-        return self.__total_time.value == other.__total_time.value
+        if isinstance(other, HourGlass):
+            return self.__total_time.value == other.__total_time.value
     
     def __ne__(self, other: "HourGlass") -> bool:
-        return self.__total_time.value != other.__total_time.value
+        if isinstance(other, HourGlass):
+            return self.__total_time.value != other.__total_time.value
     
     def __lt__(self, other: "HourGlass") -> bool:
-        return self.__total_time.value < other.__total_time.value
+        if isinstance(other, HourGlass):
+            return self.__total_time.value < other.__total_time.value
     
     def __le__(self, other: "HourGlass") -> bool:
-        return self.__total_time.value <= other.__total_time.value
+        if isinstance(other, HourGlass):
+            return self.__total_time.value <= other.__total_time.value
     
     def __gt__(self, other: "HourGlass") -> bool:
-        return self.__total_time.value > other.__total_time.value
+        if isinstance(other, HourGlass):
+            return self.__total_time.value > other.__total_time.value
     
     def __ge__(self, other: "HourGlass") -> bool:
-        return self.__total_time.value >= other.__total_time.value
+        if isinstance(other, HourGlass):
+            return self.__total_time.value >= other.__total_time.value
     
     
     @staticmethod
