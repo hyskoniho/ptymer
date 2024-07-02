@@ -2,7 +2,7 @@ from datetime import datetime
 from multiprocessing import Process, freeze_support, Value
 from time import sleep
 from psutil import Process as psProcess, pid_exists
-from typing import Any, Callable
+from typing import Callable
 
 class Timer:
     def __init__(self, visibility: bool = False) -> None:
@@ -127,16 +127,16 @@ class Timer:
 class HourGlass:
     def __init__(self, 
                  seconds: int | float, 
-                 target = None,
+                 target: Callable = None,
                  args: tuple = (), 
                  visibility: bool = False,
                  persist: bool = False) -> None:
-        
         freeze_support()
         self.__visibility: bool = visibility
-        self.__total_time = Value('i', seconds, lock=False)
+        if seconds > 0: self.__total_time = Value('i', seconds, lock=False)
+        else: raise ValueError(f"Seconds must be greater than 0!")
         self.__pid: int | None = None
-        self.__func = target
+        self.__func: Callable = target
         self.__args: tuple = args
         self.__persist: bool = persist
     
@@ -193,19 +193,21 @@ class HourGlass:
     
     def start(self) -> int:
         """
-        Start the hourglass and return the process id
+        Start the hourglass and return the self object
         """
         from os import getpid
 
         if self.__pid:
             raise RuntimeError(f"Hourglass already running!")
         else:
+            print("Starting hourglass!") if self.__visibility else None
+
             process = Process(target=self._decrease_time, args=(getpid(),))
             process.start()
             # Start the parallel process
             self.__pid = process.pid
 
-            return self.__pid
+            return self
         
     def stop(self) -> None:
         """
@@ -226,14 +228,23 @@ class HourGlass:
         """
         print(f"Remaining time: {str(self._time_format(self.__total_time.value))}")
     
+    def get_pid(self) -> int:
+        """
+        Return the process id
+        """
+        if not self.__pid:
+            raise AttributeError(f"There is no hourglass running!")
+        else:
+            return self.__pid
+    
 
 
 if __name__ == '__main__':
     # a = HourGlass(5, print, args=("a", "b",), visibility=True)
     # a = HourGlass(5, print, visibility=True)
     # a.start()
-    a = HourGlass(150, target=print, args=("a", "b",), visibility=True, persist=False)
-    a.start()
+    a = HourGlass(150, target=print, args=("a", "b",), visibility=True, persist=False).start()
+    sleep(1)
     sleep(3)
     a.show()
     exit()
