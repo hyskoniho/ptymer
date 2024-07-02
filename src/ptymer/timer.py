@@ -1,13 +1,8 @@
 from datetime import datetime
 from multiprocessing import Process, freeze_support, Value
 from time import sleep
-from psutil import Process as psProcess
-
-def raise_timeout(*args) -> None:
-    """
-    Raise a TimeoutError
-    """
-    raise TimeoutError("Timeout reached!")
+from psutil import Process as psProcess, pid_exists
+from typing import Any, Callable
 
 class Timer:
     def __init__(self, visibility: bool = False) -> None:
@@ -130,34 +125,20 @@ class Timer:
 
 
 class HourGlass:
-    def __init__(self, seconds: int | float, target: any = raise_timeout, args: tuple | None = (), visibility: bool = False) -> None:
+    def __init__(self, 
+                 seconds: int | float, 
+                 target = None,
+                 args: tuple = (), 
+                 visibility: bool = False,
+                 persist: bool = False) -> None:
+        
         freeze_support()
         self.__visibility: bool = visibility
         self.__total_time = Value('i', seconds, lock=False)
         self.__pid: int | None = None
         self.__func = target
-        self.__args = args
-
-    def __enter__(self) -> "HourGlass":
-        """
-        Start a new hourglass as a context manager.
-        """
-        if self.__pid:
-            raise RuntimeError(f"Hourglass already executing!")
-        else:
-            self.start()
-        return self
-
-    def __exit__(self, exc_type: None | Exception, exc_value: None | str, traceback: str) -> None:
-        """
-        Stop the context manager hourglass.
-        """
-        if not self.__start_time:
-            raise AttributeError(f"There is no hourglass executing!")
-        elif exc_type:
-            raise exc_type(exc_value)
-        else:
-            self.stop()
+        self.__args: tuple = args
+        self.__persist: bool = persist
     
     @staticmethod
     def _time_format(secs: int | float) -> datetime.time:
@@ -184,15 +165,26 @@ class HourGlass:
         It also interrupts main executin though the mainPid
         """
         process = psProcess(mainPid)
+        # Get main process object
 
-        while self.__total_time.value > 0:
-            self.__total_time.value-=1
-            sleep(1)
-        print("Time is up!") if self.__visibility else None
-        
-        process.suspend()
-        self.run_function(self.__func, *self.__args)
-        process.resume()
+        try:
+            while self.__total_time.value > 0 and (pid_exists(mainPid) or self.__persist):
+                self.__total_time.value-=1
+                sleep(1)
+            # Decrease time in 1 second and sleep for 1 second (main 
+            # process is not interrupted)
+            if pid_exists(mainPid):
+                print("Time is up!") if self.__visibility else None
+            else:
+                print("Main process interrupted!") if self.__visibility else None
+            
+            process.suspend()
+            self.run_function(self.__func, *self.__args)
+            process.resume()
+            # Stop main process, run the function and resume the main process
+
+        except:
+            pass
     
     def start(self) -> int:
         """
@@ -205,6 +197,7 @@ class HourGlass:
         else:
             process = Process(target=self._decrease_time, args=(getpid(),))
             process.start()
+            # Start the parallel process
             self.__pid = process.pid
 
             return self.__pid
@@ -232,9 +225,10 @@ class HourGlass:
 
 if __name__ == '__main__':
     # a = HourGlass(5, print, args=("a", "b",), visibility=True)
-    a = HourGlass(5, visibility=True)
+    # a = HourGlass(5, print, visibility=True)
+    # a.start()
+    a = HourGlass(150, target=print, args=("a", "b",), visibility=True, persist=False)
     a.start()
-    sleep(1)
-    while True:
-        pass
-    pass
+    sleep(3)
+    a.show()
+    exit()
