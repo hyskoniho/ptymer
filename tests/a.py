@@ -5,13 +5,11 @@ from ptymer import Timer, HourGlass
 from time import sleep
 
 # Timer test
+@Timer(visibility=True)
 def timer_test():
-    a = Timer(visibility=True)
-    a.mark("First mark")
-    sleep(3)
-    a.mark("Second mark")
-    sleep(2)
-    a.stop()
+    for x in range(10):
+        print(x)
+        sleep(0.8)
 
 # HourGlass test
 def hourglass_test():
@@ -20,8 +18,4 @@ def hourglass_test():
     b.stop()
 
 if __name__ == "__main__":
-    with Timer(visibility=True) as t:
-        for x in range(10):
-            t.mark(f"Mark {x+1}")
-            print(x)
-            sleep(1.2)
+    timer_test()

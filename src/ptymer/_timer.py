@@ -1,6 +1,7 @@
 from datetime import datetime
+from contextlib import ContextDecorator
 
-class Timer:
+class Timer(ContextDecorator):
     def __init__(self, visibility: bool = False) -> None:
         self.__start_time: datetime | None = None
         self.__marks: list[list[str, ]] = []
