@@ -20,7 +20,7 @@ def hourglass_test():
     print(f"\n{b}\n")
 
 if __name__ == "__main__":
-    a = Alarm(target="Oi", args=("CHEGA",), schedules=[datetime.now()], visibility=True).start()
+    a = Alarm(target=print, args=("CHEGA",), schedules=[datetime.now()], visibility=True).start()
     print(a)
     sleep(10)
     a.stop()

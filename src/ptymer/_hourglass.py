@@ -31,6 +31,22 @@ class HourGlass:
 
         self.__persist: bool = persist
         # If True, the secondary process will not be interrupted when the main process is interrupted
+        
+        self.__validate()
+    
+    def __validate(self) -> None:
+        if not isinstance(self.__visibility, bool):
+            raise TypeError("Visibility must be a boolean!")  
+        elif not isinstance(self.__total_time.value, int) or not isinstance(self.__total_time.value, float):
+            raise TypeError("Seconds must be numeric!")
+        elif not isinstance(self.__func, Callable):
+            raise TypeError("Target must be a function!")
+        elif not isinstance(self.__args, tuple):
+            raise TypeError("Arguments must be a tuple!")
+        elif not isinstance(self.__persist, bool):
+            raise TypeError("Persist must be a boolean!")
+     
+    
 
     def __str__(self) -> str:
         return f"Class HourGlass()\nVisibility: {self.__visibility}\nRemaining time: {self.__total_time.value}\nProcess id: {self.__pid if self.__pid and pid_exists(self.__pid) else None}\nFunction: {self.__func}\nArguments: {self.__args}\nPersist: {self.__persist}\n"

@@ -6,6 +6,12 @@ class Timer(ContextDecorator):
         self.__start_time: datetime | None = None
         self.__marks: list[list[str, ]] = []
         self.__visibility: bool = visibility
+
+        self.__validate()
+
+    def __validate(self) -> None:
+        if not isinstance(self.__visibility, bool):
+            raise TypeError("Visibility must be a boolean!")
     
     def __str__(self) -> str:
         return f"Class Timer()\nVisibility: {self.__visibility}\nStatus: {"on" if self.__start_time else "off"}\nStart time: {str(self.__start_time)}\nTime since start: {str(self.current_time())}\nQuantity of marks: {len(self.__marks)}\n"
