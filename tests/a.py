@@ -1,8 +1,9 @@
 import sys
 sys.path.insert(1, r'.\src')
 
-from ptymer import Timer, HourGlass
+from ptymer import Timer, HourGlass, Alarm
 from time import sleep
+from datetime import datetime
 
 # Timer test
 @Timer(visibility=True)
@@ -19,4 +20,7 @@ def hourglass_test():
     print(f"\n{b}\n")
 
 if __name__ == "__main__":
-    hourglass_test()
+    a = Alarm(target="Oi", args=("CHEGA",), schedules=[datetime.now()], visibility=True).start()
+    print(a)
+    sleep(10)
+    a.stop()

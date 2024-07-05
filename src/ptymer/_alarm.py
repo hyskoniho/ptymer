@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Callable, Any
+from typing import Callable, Any, List, Tuple
 from dataclasses import dataclass
 from dateutil import parser
 from psutil import Process as psProcess, pid_exists
@@ -7,10 +7,7 @@ from time import sleep
 
 @dataclass
 class Alarm():
-    """
-    Alarm class
-    """
-    schedules: list[datetime | str]
+    schedules: List[datetime | str | Tuple[int, int, int, int, int, int]]
     # list of datetime objects
     target: Callable
     # function that will be executed when the alarm is triggered
@@ -25,17 +22,39 @@ class Alarm():
 
     def __post_init__(self) -> None:
         """
-        Post initialization method
+        Post initialization method, checks if the schedules and other
+        attr are valid and converts strings to datetime objects
         """
+        self.__validate()
+
         for idx, date_obj in enumerate(self.schedules):
             try:
-                assert (type(date_obj) == datetime or type(date_obj) == str)
+                assert (type(date_obj) in [datetime, tuple, str])
                 if type(date_obj) == str:
                     self.schedules[idx] = parser.parse(date_obj)
+                elif type(date_obj) == tuple:
+                    self.schedules[idx] = datetime(*date_obj)
+                elif type(date_obj) == datetime:
+                    self.schedules[idx] = date_obj.replace(microsecond=0)
             except:
                 raise TypeError(f"Invalid datetime object: {date_obj}")
             finally:
                 pass
+
+    def __str__(self) -> str:
+        return f"Class Alarm()\nVisibility: {self.visibility}\nSchedules:\n {[str(schedule) for schedule in self.schedules]}\nTarget function: {self.target}\nArguments:\n {[arg +': ' + str(type(arg)) for arg in self.args]}\nPersist: {self.persist}\nProcess id: {self.__pid if self.__pid and pid_exists(self.__pid) else None}\n"
+    
+    def __validate(self) -> None:
+        if not isinstance(self.schedules, list):
+            raise TypeError("Schedules must be a list!")
+        elif not isinstance(self.target, Callable):
+            raise TypeError("Target must be a function!")
+        elif not isinstance(self.args, tuple):
+            raise TypeError("Arguments must be a tuple!")
+        elif not isinstance(self.visibility, bool):
+            raise TypeError("Visibility must be a boolean!")
+        elif not isinstance(self.persist, bool):
+            raise TypeError("Persist must be a boolean!")
     
     def start(self) -> "Alarm":
         """
