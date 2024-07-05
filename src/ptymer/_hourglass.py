@@ -33,7 +33,7 @@ class HourGlass:
         # If True, the secondary process will not be interrupted when the main process is interrupted
 
     def __str__(self) -> str:
-        return f"Class HourGlass()\nVisibility: {self.__visibility}\nRemaining time: {self.__total_time.value}\nProcess id: {self.__pid if pid_exists(self.__pid) else None}\nFunction: {self.__func}\nArguments: {self.__args}\nPersist: {self.__persist}\n"
+        return f"Class HourGlass()\nVisibility: {self.__visibility}\nRemaining time: {self.__total_time.value}\nProcess id: {self.__pid if self.__pid and pid_exists(self.__pid) else None}\nFunction: {self.__func}\nArguments: {self.__args}\nPersist: {self.__persist}\n"
     
     def __eq__(self, other: "HourGlass") -> bool:
         if isinstance(other, HourGlass):
@@ -151,7 +151,10 @@ class HourGlass:
         """
         Show the remaining time in str format (HH:MM:SS.ms)
         """
-        print(f"Remaining time: {str(self._time_format(self.__total_time.value))}")
+        if self.__pid and pid_exists(self.__pid):
+            print(f"Remaining time: {str(self._time_format(self.__total_time.value))}")
+        else:
+            raise AttributeError(f"There is no hourglass running!")
     
     def get_pid(self) -> int:
         """

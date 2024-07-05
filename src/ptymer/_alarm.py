@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Callable, Any
 from dataclasses import dataclass
 from dateutil import parser
-from psutil import Process as psProcess
+from psutil import Process as psProcess, pid_exists
 from time import sleep
 
 @dataclass
@@ -52,7 +52,7 @@ class Alarm():
             raise ValueError("Arguments must be defined!")
         elif not self.schedules:
             raise ValueError("Schedules must be defined!")
-        elif self.__pid:
+        elif self.__pid and pid_exists(self.__pid):
             raise ValueError("Alarm already set!")
         else:
             process = Process(target=self._alarm_loop, args=(getpid(),))
@@ -76,8 +76,6 @@ class Alarm():
         """
         Alarm loop
         """
-        from psutil import pid_exists
-
         while len(self.schedules) > 0 and pid_exists(mainPid):
             now = datetime.now().replace(microsecond=0)
             try:
@@ -97,7 +95,6 @@ class Alarm():
         """
         Stop the alarm
         """
-        from psutil import pid_exists
         if self.__pid and pid_exists(self.__pid):
             process = psProcess(self.__pid)
             process.terminate()
