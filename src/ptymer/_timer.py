@@ -142,3 +142,6 @@ class Timer(ContextDecorator):
         Show the current time in str format (HH:MM:SS.ms)
         """
         print(f"Current time: {str(self.current_time())}")
+
+if __name__ == "__main__":
+    pass

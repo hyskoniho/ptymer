@@ -13,9 +13,10 @@ def timer_test():
 
 # HourGlass test
 def hourglass_test():
-    b = HourGlass(seconds=10, visibility=True, persist=True, target=print, args=("Function executed!")).start()
-    sleep(11)
-    print(b)
+    b = HourGlass(seconds=6, visibility=True, persist=True, target=print, args=("Function executed!",)).start()
+    print(f"\n{b}\n")
+    sleep(8)
+    print(f"\n{b}\n")
 
 if __name__ == "__main__":
     hourglass_test()

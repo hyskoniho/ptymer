@@ -11,11 +11,17 @@ class Alarm():
     Alarm class
     """
     schedules: list[datetime | str]
+    # list of datetime objects
     target: Callable
+    # function that will be executed when the alarm is triggered
     args: tuple[Any] = ()
+    # arguments of the function
     visibility: bool = False
+    # defines if the alarm will show messages or not
     persist: bool = False
+    # if true, the alarm will not be elimnated after being triggered
     __pid: int | None = None
+    # process id of the alarm
 
     def __post_init__(self) -> None:
         """
@@ -80,11 +86,12 @@ class Alarm():
                 sleep(0.1)
                 continue
             else:
+                print("Alarm finished!") if self.visibility else None
+
                 self.run_function(self.target, *self.args)
                 self.schedules.pop(idx) if not self.persist else None
             
         self.__pid = None
-        print("Alarm finished!") if self.visibility else None
     
     def stop(self) -> None:
         """
@@ -101,9 +108,4 @@ class Alarm():
         print("Alarm stopped!") if self.visibility else None
 
 if __name__ == "__main__":
-    a = Alarm(schedules=["2024-07-05 11:11:30"], target=print, args=("Hello", "World"), visibility=True).start()
-    print(a)
-    print(a.schedules)
-    from time import sleep
-    sleep(50)
-    
+    pass

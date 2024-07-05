@@ -1,7 +1,7 @@
 from typing import Callable
 from multiprocessing import Process, Value, freeze_support
 from datetime import datetime
-from psutil import Process as psProcess
+from psutil import Process as psProcess, pid_exists
 
 class HourGlass:
     def __init__(self, 
@@ -33,7 +33,7 @@ class HourGlass:
         # If True, the secondary process will not be interrupted when the main process is interrupted
 
     def __str__(self) -> str:
-        return f"Class HourGlass()\nVisibility: {self.__visibility}\nRemaining time: {self.__total_time.value}\nProcess id: {self.__pid}\nFunction: {self.__func}\nArguments: {self.__args}\nPersist: {self.__persist}\n"
+        return f"Class HourGlass()\nVisibility: {self.__visibility}\nRemaining time: {self.__total_time.value}\nProcess id: {self.__pid if pid_exists(self.__pid) else None}\nFunction: {self.__func}\nArguments: {self.__args}\nPersist: {self.__persist}\n"
     
     def __eq__(self, other: "HourGlass") -> bool:
         if isinstance(other, HourGlass):
@@ -77,7 +77,7 @@ class HourGlass:
         return datetime.strptime(time_str, "%H %M %S.%f").time()
     
     @staticmethod
-    def run_function(func, *args) -> any:
+    def run_function(func, args) -> any:
         """
         Run a function with arguments
         """
@@ -95,7 +95,6 @@ class HourGlass:
         It also interrupts main executin though the mainPid
         """
         from time import sleep
-        from psutil import pid_exists
 
         process = psProcess(mainPid)
 
@@ -109,12 +108,12 @@ class HourGlass:
             print("Time is up!" if pid_exists(mainPid) else "Main process interrupted!") if self.__visibility else None 
             
             process.suspend()
-            self.run_function(self.__func, *self.__args)
+            self.run_function(self.__func, self.__args)
             process.resume()
             # Stop main process, run the function and resume the main process
-
-        except:
-            pass
+        except Exception as e:
+            raise e
+    
     
     def start(self) -> "HourGlass":
         """
@@ -122,7 +121,7 @@ class HourGlass:
         """
         from os import getpid
 
-        if self.__pid:
+        if self.__pid and pid_exists(self.__pid):
             raise RuntimeError(f"Hourglass already running!")
         else:
             print("Starting hourglass!") if self.__visibility else None
@@ -139,7 +138,7 @@ class HourGlass:
         """
         Stop the hourglass
         """
-        if not self.__pid:
+        if not self.__pid or not pid_exists(self.__pid):
             raise AttributeError(f"There is no hourglass running!")
         else:
             process = psProcess(self.__pid)
@@ -158,8 +157,11 @@ class HourGlass:
         """
         Return the process id
         """
-        if not self.__pid:
+        if not self.__pid or not pid_exists(self.__pid):
             raise AttributeError(f"There is no hourglass running!")
         else:
             return int(self.__pid)
+        
+if __name__ == "__main__":
+    pass
     
