@@ -11,7 +11,7 @@ class Alarm():
     # list of datetime objects
     target: Callable
     # function that will be executed when the alarm is triggered
-    args: tuple[Any] = ()
+    args: Tuple[Any] = ()
     # arguments of the function
     visibility: bool = False
     # defines if the alarm will show messages or not
