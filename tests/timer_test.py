@@ -28,6 +28,7 @@ def context_manager_test():
 def decorator_test():
     sleep(5)
 
+# Test with marks
 def mark_test():
     tm = Timer(visibility=True).start()
     for x in range(5):
@@ -36,6 +37,8 @@ def mark_test():
         sleep(0.5)
     tm.stop()
 
+# Test with comparative operators
+# obs.: minor means started first
 def comparative_tests():
     tm1 = Timer().start()
     sleep(0.1)

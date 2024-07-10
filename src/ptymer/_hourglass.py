@@ -36,15 +36,15 @@ class HourGlass:
     
     def __validate(self) -> None:
         if not isinstance(self.__visibility, bool):
-            raise TypeError("Visibility must be a boolean!")  
-        elif not isinstance(self.__total_time.value, int) or not isinstance(self.__total_time.value, float):
-            raise TypeError("Seconds must be numeric!")
+            raise TypeError(f"Visibility must be a boolean! Got {type(self.__visibility)}!")  
+        elif not isinstance(self.__total_time.value, (float, int)):
+            raise TypeError(f"Seconds must be numeric! Got {type(self.__total_time.value)}!")
         elif not isinstance(self.__func, Callable):
-            raise TypeError("Target must be a function!")
+            raise TypeError(f"Target must be a function! Got {type(self.__func)}!")
         elif not isinstance(self.__args, tuple):
-            raise TypeError("Arguments must be a tuple!")
+            raise TypeError(f"Arguments must be a tuple! Got {type(self.__args)}!")
         elif not isinstance(self.__persist, bool):
-            raise TypeError("Persist must be a boolean!")
+            raise TypeError(f"Persist must be a boolean! Got {type(self.__persist)}!")
      
     
 
