@@ -16,7 +16,7 @@ from time import sleep
 def hourglass_test():
     hg = HourGlass(seconds=5, visibility=True).start()
     sleep(5)
-    
+
 if __name__ == "__main__":
     print("\nTeste 1:")
     hourglass_test()
