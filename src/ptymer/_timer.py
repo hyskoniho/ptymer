@@ -80,7 +80,7 @@ class Timer(ContextDecorator):
             raise RuntimeError(f"Timer already executing!")
         else:
             self.__start_time = datetime.now()
-            
+            print(f"Starttime: {str(self._time_format(0))}") if self.__visibility else None
             return self
     
     def stop(self) -> datetime.time:
@@ -95,7 +95,7 @@ class Timer(ContextDecorator):
             self.__start_time = None
 
             if self.__visibility:
-                print(f"\nEndtime: {str(end_time)}")
+                print(f"Endtime: {str(end_time)}")
                 if len(self.__marks) > 0:
                     print("Marks:")
                     [print(f"{x+1}: {mark[0]}{(" \t '" + str(mark[1]) + "'") if mark[1] != "" else ""}") for x, mark in enumerate(self.__marks)]
