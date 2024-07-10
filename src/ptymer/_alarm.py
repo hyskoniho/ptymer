@@ -34,8 +34,10 @@ class Alarm():
                     self.schedules[idx] = parser.parse(date_obj)
                 elif type(date_obj) == tuple:
                     self.schedules[idx] = datetime(*date_obj)
+                    # converting tuple(d, h, m, s) to datetime object
                 elif type(date_obj) == datetime:
                     self.schedules[idx] = date_obj.replace(microsecond=0)
+                    # truncating microseconds
             except:
                 raise TypeError(f"Invalid datetime object: {date_obj}")
             finally:
