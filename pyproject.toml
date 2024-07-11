@@ -23,4 +23,5 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/hyskoniho/ptymer"
+Documentation = "https://github.com/hyskoniho/ptymer/wiki"
 Issues = "https://github.com/hyskoniho/ptymer/issues"
