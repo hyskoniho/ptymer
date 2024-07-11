@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from dateutil import parser
 from psutil import Process as psProcess, pid_exists
 from time import sleep
+from multiprocessing import Process, freeze_support
 
 @dataclass
 class Alarm():
@@ -23,10 +24,14 @@ class Alarm():
     def __post_init__(self) -> None:
         """
         Post initialization method, checks if the schedules and other
-        attr are valid and converts strings to datetime objects
+        attr are valid and converts strings to datetime objectsr
         """
         if not isinstance(self.schedules, list):
             raise TypeError("Schedules must be a list!")
+        elif not self.schedules:
+            raise ValueError("Schedules must be defined!")
+        elif not self.target:
+            raise ValueError("Target function must be defined!")
         elif not isinstance(self.target, Callable):
             raise TypeError("Target must be a function!")
         elif not isinstance(self.args, tuple):
@@ -59,18 +64,10 @@ class Alarm():
         """
         Setup alarm
         """
-        from multiprocessing import Process, freeze_support
         from os import getpid
         freeze_support()
-        print("Setting up alarm!") if self.visibility else None
         
-        if not self.target:
-            raise ValueError("Target function must be defined!")
-        elif not self.args:
-            raise ValueError("Arguments must be defined!")
-        elif not self.schedules:
-            raise ValueError("Schedules must be defined!")
-        elif self.__pid and pid_exists(self.__pid):
+        if self.__pid and pid_exists(self.__pid):
             raise ValueError("Alarm already set!")
         else:
             process = Process(target=self._alarm_loop, args=(getpid(),))
