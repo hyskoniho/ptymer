@@ -1,6 +1,6 @@
 from datetime import datetime
 from contextlib import ContextDecorator
-from typing import Optional, Union
+from typing import Optional, Union, Dict, Tuple
 
 class Timer(ContextDecorator):
     def __init__(self, visibility: bool = False) -> None:
@@ -95,10 +95,7 @@ class Timer(ContextDecorator):
                 print(f"Endtime: {str(end_time)}")
                 if len(self.__marks) > 0:
                     print("Marks:")
-                    # [print(f"{x+1}: {mark[0]}{(" \t '" + str(mark[1]) + "'") if mark[1] != "" else ""}") for x, mark in enumerate(self.__marks)]
-                    # [print(f"{x+1}: {mark[0]}{(' \t ' + str(mark[1])) if mark[1] else ''}") for x, mark in enumerate(self.__marks)]
-                    [print(f"{x+1}: {mark[0]}{mark[1]:30}") for x, mark in enumerate(self.__marks)]
-
+                    self.list_marks()
 
             return end_time
         
@@ -132,15 +129,17 @@ class Timer(ContextDecorator):
             raise AttributeError(f"There is no timer executing!")
         else:
             if self.__visibility:
-                print(f"Mark {len(self.__marks)+1}: {str(self.current_time())}{(observ) if observ else ''}")
+                print(f"Mark {len(self.__marks)+1}: {str(self.current_time())}" + "\t" + f"{(observ) if observ else ''}")
             self.__marks.append([self.current_time(), observ if observ else ""])
 
-    def list_marks(self) -> None:
+    def list_marks(self) -> Dict[int, Tuple[str, datetime.time]]:
         """
         Returns a dictionary with the marks and their respective times
         """
         if self.__marks == []:
             raise AttributeError(f"There are no marks to show!")
+        elif self.__visibility:
+            [print(f"{x+1}: {mark[0]}" + "\t" + f"{mark[1]}") for x, mark in enumerate(self.__marks)]
         return {idx: (sublist[0], sublist[1]) for idx, sublist in enumerate(self.__marks)}
     
     def show(self) -> None:
