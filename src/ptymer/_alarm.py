@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Callable, Any, List, Tuple
+from typing import Callable, Any, List, Tuple, Union, Optional
 from dataclasses import dataclass
 from dateutil import parser
 from psutil import Process as psProcess, pid_exists
@@ -8,7 +8,7 @@ from multiprocessing import Process, freeze_support
 
 @dataclass
 class Alarm():
-    schedules: List[datetime | str | Tuple[int, int, int, int, int, int]]
+    schedules: List[Union[datetime, str, Tuple[int, int, int, int, int, int]]]
     # list of datetime objects
     target: Callable
     # function that will be executed when the alarm is triggered
@@ -18,7 +18,7 @@ class Alarm():
     # defines if the alarm will show messages or not
     persist: bool = False
     # if true, the alarm will not be elimnated after being triggered
-    __pid: int | None = None
+    __pid: Optional[int] = None
     # process id of the alarm
 
     def __post_init__(self) -> None:

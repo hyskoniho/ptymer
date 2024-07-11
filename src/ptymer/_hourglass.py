@@ -1,11 +1,11 @@
-from typing import Callable
+from typing import Callable, Optional, Union
 from multiprocessing import Process, Value, freeze_support
 from datetime import datetime
 from psutil import Process as psProcess, pid_exists
 
 class HourGlass:
     def __init__(self, 
-                 seconds: int | float, 
+                 seconds: Union[int, float], 
                  target: Callable = print,
                  args: tuple = ("\n",), 
                  visibility: bool = False,
@@ -25,7 +25,7 @@ class HourGlass:
         else: self.__total_time = Value('i', seconds, lock=False)
         # Total time of the hourglass
 
-        self.__pid: int | None = None
+        self.__pid: Optional[int] = None
         # Process id of the hourglass
 
         if not isinstance(target, Callable):
@@ -70,14 +70,14 @@ class HourGlass:
         if isinstance(other, HourGlass):
             return self.__total_time.value >= other.__total_time.value
     
-    def __call__(self, seconds: int | float) -> "HourGlass":
+    def __call__(self, seconds: Union[int, float]) -> "HourGlass":
         self.__total_time.value = seconds
         # Change the total time of the hourglass
 
         return self
     
     @staticmethod
-    def _time_format(secs: int | float) -> datetime.time:
+    def _time_format(secs: Union[int, float]) -> datetime.time:
         """
         Convert seconds to datetime.time
         """

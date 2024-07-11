@@ -1,20 +1,17 @@
 from datetime import datetime
 from contextlib import ContextDecorator
+from typing import Optional, Union
 
 class Timer(ContextDecorator):
     def __init__(self, visibility: bool = False) -> None:
-        self.__start_time: datetime | None = None
+        self.__start_time: Optional[datetime] = None
         self.__marks: list[list[str, ]] = []
-        self.__visibility: bool = visibility
-
-        self.__validate()
-
-    def __validate(self) -> None:
-        if not isinstance(self.__visibility, bool):
+        if not isinstance(visibility, bool):
             raise TypeError("Visibility must be a boolean!")
-    
+        else: self.__visibility: bool = visibility
+
     def __str__(self) -> str:
-        return f"Class Timer()\nVisibility: {self.__visibility}\nStatus: {"on" if self.__start_time else "off"}\nStart time: {str(self.__start_time)}\nTime since start: {str(self.current_time())}\nQuantity of marks: {len(self.__marks)}\n"
+        return f"Class Timer()\nVisibility: {self.__visibility}\nStatus: {'on' if self.__start_time else 'off'}\nStart time: {str(self.__start_time)}\nTime since start: {str(self.current_time())}\nQuantity of marks: {len(self.__marks)}\n"
     
     def __enter__(self) -> "Timer":
         """
@@ -26,7 +23,7 @@ class Timer(ContextDecorator):
             self.start()
         return self
 
-    def __exit__(self, exc_type: None | Exception, exc_value: None | str, traceback: str) -> None:
+    def __exit__(self, exc_type: Optional[Exception], exc_value: Optional[str], traceback: str) -> None:
         """
         Stop the context manager timer.
         """
@@ -62,7 +59,7 @@ class Timer(ContextDecorator):
             return self.__start_time >= other.__start_time
 
     @staticmethod
-    def _time_format(secs: int | float) -> datetime.time:
+    def _time_format(secs: Union[int, float]) -> datetime.time:
         """
         Convert seconds to datetime.time
         """
@@ -98,8 +95,11 @@ class Timer(ContextDecorator):
                 print(f"Endtime: {str(end_time)}")
                 if len(self.__marks) > 0:
                     print("Marks:")
-                    [print(f"{x+1}: {mark[0]}{(" \t '" + str(mark[1]) + "'") if mark[1] != "" else ""}") for x, mark in enumerate(self.__marks)]
-            
+                    # [print(f"{x+1}: {mark[0]}{(" \t '" + str(mark[1]) + "'") if mark[1] != "" else ""}") for x, mark in enumerate(self.__marks)]
+                    # [print(f"{x+1}: {mark[0]}{(' \t ' + str(mark[1])) if mark[1] else ''}") for x, mark in enumerate(self.__marks)]
+                    [print(f"{x+1}: {mark[0]}{mark[1]:30}") for x, mark in enumerate(self.__marks)]
+
+
             return end_time
         
     def restart(self) -> None:
@@ -124,7 +124,7 @@ class Timer(ContextDecorator):
         else:
             return self._time_format((datetime.now() - self.__start_time).total_seconds())
     
-    def mark(self, observ: None | str = None) -> None:
+    def mark(self, observ: Optional[str] = None) -> None:
         """
         Create a mark with the current time and an observation (optional)
         """
@@ -132,7 +132,7 @@ class Timer(ContextDecorator):
             raise AttributeError(f"There is no timer executing!")
         else:
             if self.__visibility:
-                print(f"Mark {len(self.__marks)+1}: {str(self.current_time())}{(' \t ' + observ) if observ else ''}")
+                print(f"Mark {len(self.__marks)+1}: {str(self.current_time())}{(observ) if observ else ''}")
             self.__marks.append([self.current_time(), observ if observ else ""])
 
     def list_marks(self) -> None:
