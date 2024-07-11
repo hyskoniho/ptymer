@@ -1,77 +1,77 @@
 
 # PTymer
 
-**PTymer** é um projeto em Python que fornece insights e ações dentro da execução de um código em contexto de tempo. Este pacote inclui três classes principais: `Timer`, `HourGlass` e `Alarm`, cada uma com funcionalidades específicas para monitoramento e controle de tempo.
+**PTymer** is a Python project that provides insights and actions within the execution of code in a time context. This package includes three main classes: `Timer`, `HourGlass`, and `Alarm`, each with specific functionalities for time monitoring and control.
 
-## Índice
+## Index
 
-- [Instalação](#instalação)
-- [Uso](#uso)
+- [Installation](#installation)
+- [Usage](#usage)
   - [Timer](#timer)
   - [HourGlass](#hourglass)
   - [Alarm](#alarm)
-- [Contribuição](#contribuição)
-- [Licença](#licença)
+- [Contribution](#contribution)
+- [License](#license)
 
-## Instalação
+## Installation
 
-PTYMER é compatível com Python 3.8 ou superior. Para instalar, use o pip:
+PTymer is compatible with Python 3.8 or higher. 
+To install, use pip:
 
 ```bash
 pip install ptymer
 ```
 
-## Uso
+## Usage
 
 #### Timer
-A classe Timer é usada para medir o tempo de execução de trechos de código. Ela pode ser instanciada de várias maneiras:
-##### Instância Normal
+The Timer class is used to measure the execution time of code snippets. It can be instantiated in several ways:
+##### Normal Instance
 ```python
 from ptymer import Timer
 
 tm = Timer().start()
-# Seu código aqui
+# Your code here
 tm.stop()
 ```
 
-##### Gerenciador de Contexto
+##### Context Manager
 ```python
 from ptymer import Timer
 
 with Timer() as tm:
-    # Seu código aqui
+    # Your code here
 ```
 
-##### Decorador
+##### Decorator
 ```python
 from ptymer import Timer
 
 @Timer()
-def sua_funcao_aqui():
+def your_function_here():
 ```
 
-A classe Timer também possui a função ***Mark***, que cria uma marca de tempo no momento em que é chamada e, ao finalizar a instância Timer, é exibida uma lista com as marcas de tempo.
 
 #### HourGlass
-A classe ***HourGlass*** é usada para criar uma contagem regressiva. Após finalizar a contagem, ela executa uma função definida pelo usuário.
+The HourGlass class is used to create a countdown timer. After the countdown finishes, it executes a user-defined function.
 ```python
 from ptymer import HourGlass
 
 hg = HourGlass(seconds=5, visibility=True, target=print, args=("Hello World",)).start()
 ```
 
-*Nota:* Na tupla de argumentos, você precisa colocar uma vírgula no final para identificar que é uma tupla se houver apenas um elemento.
+*Note:* In the arguments tuple, you need to put a comma at the end to identify it as a tuple if there's only one element.
 
 #### Alarm
-A classe ***Alarm*** recebe uma lista de horários e uma função. Quando o algoritmo identifica que chegou em um dos horários, ele executa a função definida.
+The Alarm class takes a list of times and a function. When the algorithm identifies that it has reached one of the times, it executes the defined function.
 ```python
 from ptymer import Alarm
 
 alarm = Alarm(target=target, args=(), schedules=["10:49:00"], visibility=True).start()
 ```
 
-## Contribuição
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues e pull requests no repositório do GitHub.
+## Contribution
+Contributions are welcome! Feel free to open issues and pull requests on the GitHub repository.
 
-## Licença
-Este projeto está licenciado sob a Licença MIT. Veja o arquivo LICENSE para mais detalhes.
+## License
+This project is licensed under the MIT License. See the LICENSE file for more details.
