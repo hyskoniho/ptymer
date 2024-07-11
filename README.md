@@ -1,4 +1,6 @@
-<p align="center"><font size="18">PTymer ⏱️</font></p>
+<div align="center">
+  <h1>PTymer ⏱️</h1>
+</div>
 <p align="center">
   <img src="https://img.shields.io/badge/python-%2314354C.svg?style=for-the-badge&logo=python&logoColor=white">
   <img src="https://img.shields.io/badge/status-online-green?style=for-the-badge">
