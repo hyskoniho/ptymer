@@ -1,11 +1,9 @@
 <div align="center">
   <h1>PTymer ⏱️</h1>
-</div>
-<p align="center">
-  <img src="https://img.shields.io/badge/python-%2314354C.svg?style=for-the-badge&logo=python&logoColor=white">
-  <img src="https://img.shields.io/badge/status-online-green?style=for-the-badge">
+  <img src="https://img.shields.io/badge/python-%2314354C.svg?style=for-the-badge&logo=python&logoColor=white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://img.shields.io/badge/status-online-green?style=for-the-badge">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="https://img.shields.io/badge/license-MIT-yellow?style=for-the-badge">
-</p>
+</div>
 
 **PTymer** is a Python project that provides insights and actions within the execution of code in a time context. This package includes three main classes: `Timer`, `HourGlass`, and `Alarm`, each with specific functionalities for time monitoring and control.
 
@@ -77,7 +75,8 @@ alarm = Alarm(target=target, args=(), schedules=["10:49:00"], visibility=True).s
 ```
 
 ## Contribution
-Contributions are welcome! Feel free to open issues and pull requests on the GitHub repository.
+Contributions are welcome!!! Feel free to open issues and pull requests on the GitHub repository.
+Pay attention to [test files](https://github.com/hyskoniho/ptymer/tree/main/tests) files and don't forget to document every change!
 
 ## License
-This project is licensed under the MIT License. See the LICENSE file for more details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/hyskoniho/ptymer/blob/main/LICENSE) file for more details.
