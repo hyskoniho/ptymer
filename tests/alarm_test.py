@@ -17,8 +17,8 @@ def target():
         print("Alarm!")
 
 def alarm_test():    
-    alarm = Alarm(target=target, args=(), schedules=["20:50:00"], visibility=True).start()
-    sleep(100)
+    alarm = Alarm(target=target, args=(), schedules=["10:49:00"], visibility=True).start()
+    sleep(600)
 
 if __name__ == "__main__":
     print("\nTeste 1:")
