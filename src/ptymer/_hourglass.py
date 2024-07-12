@@ -46,26 +46,32 @@ class HourGlass:
     def __eq__(self, other: "HourGlass") -> bool:
         if isinstance(other, HourGlass):
             return self.__total_time.value == other.__total_time.value
+        else: raise TypeError(f"Cannot compare HourGlass with {type(other)}!")
     
     def __ne__(self, other: "HourGlass") -> bool:
         if isinstance(other, HourGlass):
             return self.__total_time.value != other.__total_time.value
+        else: raise TypeError(f"Cannot compare HourGlass with {type(other)}!")
     
     def __lt__(self, other: "HourGlass") -> bool:
         if isinstance(other, HourGlass):
             return self.__total_time.value < other.__total_time.value
-    
+        else: raise TypeError(f"Cannot compare HourGlass with {type(other)}!")
+
     def __le__(self, other: "HourGlass") -> bool:
         if isinstance(other, HourGlass):
             return self.__total_time.value <= other.__total_time.value
-    
+        else: raise TypeError(f"Cannot compare HourGlass with {type(other)}!")
+
     def __gt__(self, other: "HourGlass") -> bool:
         if isinstance(other, HourGlass):
             return self.__total_time.value > other.__total_time.value
-    
+        else: raise TypeError(f"Cannot compare HourGlass with {type(other)}!")
+
     def __ge__(self, other: "HourGlass") -> bool:
         if isinstance(other, HourGlass):
             return self.__total_time.value >= other.__total_time.value
+        else: raise TypeError(f"Cannot compare HourGlass with {type(other)}!")
     
     def __call__(self, seconds: Union[int, float]) -> "HourGlass":
         self.__total_time.value = seconds

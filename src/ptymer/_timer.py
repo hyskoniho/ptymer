@@ -37,26 +37,32 @@ class Timer(ContextDecorator):
     def __eq__(self, other: "Timer") -> bool:
         if isinstance(other, Timer):
             return self.__start_time == other.__start_time
+        else: raise TypeError(f"Cannot compare HourGlass with {type(other)}!")
 
     def __ne__(self, other: "Timer") -> bool:
         if isinstance(other, Timer):
             return self.__start_time != other.__start_time
+        else: raise TypeError(f"Cannot compare HourGlass with {type(other)}!")
     
     def __lt__(self, other: "Timer") -> bool:
         if isinstance(other, Timer):
             return self.__start_time < other.__start_time
+        else: raise TypeError(f"Cannot compare HourGlass with {type(other)}!")
     
     def __le__(self, other: "Timer") -> bool:
         if isinstance(other, Timer):
             return self.__start_time <= other.__start_time
+        else: raise TypeError(f"Cannot compare HourGlass with {type(other)}!")
     
     def __gt__(self, other: "Timer") -> bool:
         if isinstance(other, Timer):
             return self.__start_time > other.__start_time
+        else: raise TypeError(f"Cannot compare HourGlass with {type(other)}!")
     
     def __ge__(self, other: "Timer") -> bool:
         if isinstance(other, Timer):
             return self.__start_time >= other.__start_time
+        else: raise TypeError(f"Cannot compare HourGlass with {type(other)}!")
 
     @staticmethod
     def _time_format(secs: Union[int, float]) -> datetime.time:
