@@ -166,4 +166,5 @@ cython_debug/
 .vscode/
 
 .venv38/
+.venv312/
 # Folder for testing virtual environments

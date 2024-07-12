@@ -2,7 +2,7 @@
 name = "ptymer"
 version = "0.0.1"
 authors = [
-  { name="Caio Lima", email="caio.lima@live.com" },
+  { name="Caio Lima", email="caio-augusto@live.com" },
 ]
 description = "Ptymer is a lightweight Python package designed to help developers manage and monitor the execution time of their code. With features like timers and countdowns, it allows you to precisely measure runtime durations and set time-based triggers. Whether you need to benchmark performance or execute actions at specific intervals, Ptymer provides a simple and efficient solution"
 readme = "README.md"
@@ -13,12 +13,9 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "annotated-types>=0.7.0",
     "psutil>=6.0.0",
-    "pydantic_core>=2.20.1",
     "python-dateutil>=2.9.0.post0",
-    "six>=1.16.0",
-    "typing_extensions>=4.12.2"
+    "six>=1.16.0"
 ]
 
 [project.urls]
