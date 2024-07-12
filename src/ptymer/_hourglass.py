@@ -10,9 +10,6 @@ class HourGlass:
                  args: tuple = ("\n",), 
                  visibility: bool = False,
                  persist: bool = False) -> None:
-        freeze_support()
-        # Freeze support for Windows
-
         if not isinstance(visibility, bool):
             raise TypeError(f"Visibility must be a boolean! Got {type(self.__visibility)}!") 
         else: self.__visibility: bool = visibility
@@ -132,12 +129,15 @@ class HourGlass:
         """
         from os import getpid
 
+        freeze_support()
+        # Freeze support for Windows
+
         if self.__pid and pid_exists(self.__pid):
             raise RuntimeError(f"Hourglass already running!")
         else:
             print("Starting hourglass!") if self.__visibility else None
 
-            process = Process(target=self._decrease_time, args=(getpid(),))
+            process = Process(target=self._decrease_time, args=(getpid(),), daemon=True)
             process.start()
             # Start the parallel process
 

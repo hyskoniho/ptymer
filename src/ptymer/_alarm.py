@@ -65,12 +65,14 @@ class Alarm():
         Setup alarm
         """
         from os import getpid
+
         freeze_support()
-        
+        # Freeze support for windows
+
         if self.__pid and pid_exists(self.__pid):
             raise ValueError("Alarm already set!")
         else:
-            process = Process(target=self._alarm_loop, args=(getpid(),))
+            process = Process(target=self._alarm_loop, args=(getpid(),), daemon=True)
             process.start()
             self.__pid = process.pid
             return self
