@@ -74,9 +74,27 @@ from ptymer import Alarm
 alarm = Alarm(target=target, args=(), schedules=["10:49:00"], visibility=True).start()
 ```
 
+<br></br>
+
+###### ⚠️ WARNING!
+Due to multiprocessing, it's highly recommended that you safeguard the execution of the main process with the following statement before your code:"
+```python
+if __name__ == '__main__':
+    # your code here
+```
+Some sample usage:
+```python
+def foo():
+    return True
+
+if __name__ == '__main__':
+    foo()
+```
+You can find more information about this issue [here]().
+
 ## Contribution
 Contributions are welcome!!! Feel free to open issues and pull requests on the GitHub repository.
-Pay attention to [test files](https://github.com/hyskoniho/ptymer/tree/main/tests) files and don't forget to document every change!
+Pay attention to [test files](https://github.com/hyskoniho/ptymer/tree/main/tests) content and don't forget to document every change!
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](https://github.com/hyskoniho/ptymer/blob/main/LICENSE) file for more details.
