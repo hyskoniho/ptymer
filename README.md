@@ -1,6 +1,6 @@
 <div align="center">
   <h1>PTymer ⏱️</h1>
-  <img src="https://img.shields.io/badge/python-%2314354C.svg?style=for-the-badge&logo=python&logoColor=white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://img.shields.io/badge/core-python-%2314354C.svg?style=for-the-badge">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="https://img.shields.io/badge/status-online-green?style=for-the-badge">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="https://img.shields.io/badge/license-MIT-yellow?style=for-the-badge">
 </div>
@@ -77,7 +77,7 @@ alarm = Alarm(target=target, args=(), schedules=["10:49:00"], visibility=True).s
 <br></br>
 
 ###### ⚠️ WARNING!
-Due to multiprocessing, it's highly recommended that you safeguard the execution of the main process with the following statement before your code:"
+Due to multiprocessing, it's highly recommended that you safeguard the execution of the main process, when using `HourGlass` and/or `Alarm` instance, with the following statement before your code:
 ```python
 if __name__ == '__main__':
     # your code here
