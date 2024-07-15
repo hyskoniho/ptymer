@@ -16,7 +16,7 @@ class HourGlass:
         # Defines if the hourglass will show messages or not
 
         if not isinstance(seconds, (float, int)):
-            raise TypeError(f"Seconds must be numeric! Got {type(self.__total_time.value)}!")
+            raise TypeError(f"Seconds must be numeric! Got {type(seconds)}!")
         elif seconds < 1:
             raise ValueError(f"Seconds must be greater than 1!")
         else: self.__total_time = Value('i', seconds, lock=False)
@@ -26,17 +26,17 @@ class HourGlass:
         # Process id of the hourglass
 
         if not isinstance(target, Callable):
-            raise TypeError(f"Target must be a function! Got {type(self.__func)}!")
+            raise TypeError(f"Target must be a function! Got {type(target)}!")
         else: self.__func: Callable = target
         # Function to be executed when time is up
 
         if not isinstance(args, tuple):
-            raise TypeError(f"Arguments must be a tuple! Got {type(self.__args)}!")
+            raise TypeError(f"Arguments must be a tuple! Got {type(args)}!")
         else: self.__args: tuple = args
         # Arguments of the function
 
         if not isinstance(persist, bool):
-            raise TypeError(f"Persist must be a boolean! Got {type(self.__persist)}!")
+            raise TypeError(f"Persist must be a boolean! Got {type(persist)}!")
         else: self.__persist: bool = persist
         # If True, the secondary process will not be interrupted when the main process is interrupted 
 
@@ -164,15 +164,32 @@ class HourGlass:
             if self.__visibility:
                 print("Hourglass stopped!")
     
-    def show(self) -> None:
+    def remaining_time(self) -> datetime.time:
         """
         Show the remaining time in str format (HH:MM:SS.ms)
         """
-        if self.__pid and pid_exists(self.__pid):
-            print(f"Remaining time: {str(self._time_format(self.__total_time.value))}")
-        else:
+        if not self.__pid or not pid_exists(self.__pid):
             raise AttributeError(f"There is no hourglass running!")
+        else:
+            val = self._time_format(self.__total_time.value)
+            print(f"Remaining time: {str(val)}") if self.__visibility else None  
+            return val
     
+    def remaining_seconds(self) -> int:
+        """
+        Show the remaining time in int (seconds)
+        """
+        if not self.__pid or not pid_exists(self.__pid):
+            raise AttributeError(f"There is no hourglass running!")
+        else:
+            dateobj = self._time_format(self.__total_time.value)
+
+            total = int(dateobj.strftime('%S'))
+            total += int(dateobj.strftime('%M')) * 60
+            total += int(dateobj.strftime('%H')) * 60 * 60
+            print(f"Remaining seconds: {total}") if self.__visibility else None
+            return total
+
     def get_pid(self) -> int:
         """
         Return the process id
