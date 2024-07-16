@@ -19,7 +19,7 @@ class HourGlass:
             raise TypeError(f"Seconds must be numeric! Got {type(seconds)}!")
         elif seconds < 1:
             raise ValueError(f"Seconds must be greater than 1!")
-        else: self.__total_time = Value('i', seconds, lock=False)
+        else: self.__total_time = Value('i', int(seconds), lock=True) if isinstance(seconds, int) else Value('d', float(seconds), lock=True)
         # Total time of the hourglass
 
         self.__pid: Optional[int] = None
@@ -43,7 +43,7 @@ class HourGlass:
         # If True, the secondary process will not be interrupted when the main process is interrupted 
 
     def __str__(self) -> str:
-        return f"Class HourGlass()\nVisibility: {self.__visibility}\nRemaining time: {self.__total_time.value}\nProcess id: {self.__pid if self.__pid and pid_exists(self.__pid) else None}\nFunction: {self.__func}\nArguments: {self.__args}\nPersist: {self.__persist}\nErrors: {str(self.__errors.value)}\n"
+        return f"Class HourGlass()\nVisibility: {self.__visibility}\nRemaining time: {self.__total_time.value}\nProcess id: {self.__pid if self.__pid and pid_exists(self.__pid) else None}\nFunction: {self.__func}\nArguments: {self.__args}\nPersist: {self.__persist}\n"
     
     def __eq__(self, other: "HourGlass") -> bool:
         if isinstance(other, HourGlass):
@@ -89,7 +89,8 @@ class HourGlass:
         mins, secs = divmod(secs, 60)
         hours, mins = divmod(mins, 60)
  
-        time_str = f"{int(hours)} {int(mins)} {float(secs)}"
+        time_str = f"{int(hours)} {int(mins)} {float(secs):.2f}"
+        print(time_str)
         return datetime.strptime(time_str, "%H %M %S.%f").time()
     
     def run_function(self) -> any:

@@ -14,8 +14,9 @@ from time import sleep
 
 # Simple test
 def hourglass_test():
-    hg = HourGlass(seconds=5, visibility=True).start()
+    hg = HourGlass(seconds=5.3354935, visibility=True).start()
     sleep(5)
+    print(hg)
 
 def comparative_tests():
     hg1 = HourGlass(seconds=5, visibility=True).start()
@@ -31,13 +32,12 @@ def comparative_tests():
     sleep(5)
 
 def func_tests():
-    hg = HourGlass(seconds=5, visibility=True).start()
+    hg = HourGlass(seconds=325.2, visibility=True).start()
     sleep(2)
-    print(f"Current time: {hg.remaining_time()}")
-    sleep(2)
-    print(f"Current seconds: {hg.remaining_seconds()}")
-    sleep(1)
+    print(f"Remaining time: {hg.remaining_time()}")
+    print(f"Remaining seconds: {hg.remaining_seconds()}")
     hg.stop()
+    sleep(1)    
 
 # Target tests
 def target():
