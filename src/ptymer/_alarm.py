@@ -10,9 +10,9 @@ from multiprocessing import Process, freeze_support
 class Alarm():
     schedules: List[Union[datetime, str, Tuple[int, int, int, int, int, int]]]
     # list of datetime objects
-    target: Callable
+    target: Optional[Callable] = None
     # function that will be executed when the alarm is triggered
-    args: Tuple[Any] = ()
+    args: Optional[Tuple[Any]] = None
     # arguments of the function
     visibility: bool = False
     # defines if the alarm will show messages or not
@@ -32,10 +32,12 @@ class Alarm():
             raise ValueError("Schedules must be defined!")
         elif not self.target:
             raise ValueError("Target function must be defined!")
-        elif not isinstance(self.target, Callable):
+        elif self.target and not isinstance(self.target, Callable):
             raise TypeError("Target must be a function!")
-        elif not isinstance(self.args, tuple):
+        elif self.args and not isinstance(self.args, tuple):
             raise TypeError("Arguments must be a tuple!")
+        elif self.args and not self.target:
+            raise ValueError(f"Arguments cannot be defined without a target function!")
         elif not isinstance(self.visibility, bool):
             raise TypeError("Visibility must be a boolean!")
         elif not isinstance(self.persist, bool):
@@ -76,23 +78,31 @@ class Alarm():
             process.start()
             self.__pid = process.pid
             return self
-
-    @staticmethod
-    def run_function(func, *args) -> any:
+        
+    def run_function(self) -> any:
         """
         Run a function with arguments
         """
         try:
-            value = func(*args)
-        except:
-            pass
+            if self.__func and self.__args:
+                value = self.__func(*self.__args)
+            elif self.__func and not self.__args:
+                value = self.__func()
+            else:
+                value = None
+        except Exception as e:
+            print(f"Error ocurred:\n{e}") if self.__visibility else None
+            return str(e)
         else:
             return value
         
-    def _alarm_loop(self, mainPid) -> None:
+    def _alarm_loop(self, mainPid: int) -> None:
         """
         Alarm loop
         """
+
+        process = psProcess(mainPid)
+
         while len(self.schedules) > 0 and pid_exists(mainPid):
             now = datetime.now().replace(microsecond=0)
             try:
@@ -103,7 +113,10 @@ class Alarm():
             else:
                 print("Alarm finished!") if self.visibility else None
 
-                self.run_function(self.target, *self.args)
+                process.suspend()
+                self.run_function()
+                process.resume()
+
                 self.schedules.pop(idx) if not self.persist else None
             
         self.__pid = None
