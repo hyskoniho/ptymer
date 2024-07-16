@@ -6,8 +6,8 @@ from psutil import Process as psProcess, pid_exists
 class HourGlass:
     def __init__(self, 
                  seconds: Union[int, float], 
-                 target: Callable = print,
-                 args: tuple = ("\n",), 
+                 target: Optional[Callable] = None,
+                 args: Optional[tuple] = None,
                  visibility: bool = False,
                  persist: bool = False) -> None:
         if not isinstance(visibility, bool):
@@ -25,13 +25,15 @@ class HourGlass:
         self.__pid: Optional[int] = None
         # Process id of the hourglass
 
-        if not isinstance(target, Callable):
+        if target and not isinstance(target, Callable):
             raise TypeError(f"Target must be a function! Got {type(target)}!")
         else: self.__func: Callable = target
         # Function to be executed when time is up
 
-        if not isinstance(args, tuple):
+        if args and not isinstance(args, tuple):
             raise TypeError(f"Arguments must be a tuple! Got {type(args)}!")
+        elif args and not target:
+            raise ValueError(f"Arguments cannot be defined without a target function!")
         else: self.__args: tuple = args
         # Arguments of the function
 
@@ -41,7 +43,7 @@ class HourGlass:
         # If True, the secondary process will not be interrupted when the main process is interrupted 
 
     def __str__(self) -> str:
-        return f"Class HourGlass()\nVisibility: {self.__visibility}\nRemaining time: {self.__total_time.value}\nProcess id: {self.__pid if self.__pid and pid_exists(self.__pid) else None}\nFunction: {self.__func}\nArguments: {self.__args}\nPersist: {self.__persist}\n"
+        return f"Class HourGlass()\nVisibility: {self.__visibility}\nRemaining time: {self.__total_time.value}\nProcess id: {self.__pid if self.__pid and pid_exists(self.__pid) else None}\nFunction: {self.__func}\nArguments: {self.__args}\nPersist: {self.__persist}\nErrors: {str(self.__errors.value)}\n"
     
     def __eq__(self, other: "HourGlass") -> bool:
         if isinstance(other, HourGlass):
@@ -90,15 +92,20 @@ class HourGlass:
         time_str = f"{int(hours)} {int(mins)} {float(secs)}"
         return datetime.strptime(time_str, "%H %M %S.%f").time()
     
-    @staticmethod
-    def run_function(func, args) -> any:
+    def run_function(self) -> any:
         """
         Run a function with arguments
         """
         try:
-            value = func(*args)
-        except:
-            pass
+            if self.__func and self.__args:
+                value = self.__func(*self.__args)
+            elif self.__func and not self.__args:
+                value = self.__func()
+            else:
+                value = None
+        except Exception as e:
+            print(f"Error ocurred:\n{e}") if self.__visibility else None
+            return str(e)
         else:
             return value
     
@@ -122,12 +129,11 @@ class HourGlass:
             print("Time is up!" if pid_exists(mainPid) else "Main process interrupted!") if self.__visibility else None 
             
             process.suspend()
-            self.run_function(self.__func, self.__args)
+            self.run_function()
             process.resume()
             # Stop main process, run the function and resume the main process
         except Exception as e:
             raise e
-    
     
     def start(self) -> "HourGlass":
         """

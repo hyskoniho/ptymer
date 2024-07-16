@@ -39,7 +39,23 @@ def func_tests():
     sleep(1)
     hg.stop()
 
+# Target tests
+def target():
+    print("1!")
+def target2(num):
+    print(f"{num}!")
+
+def target_test():
+    hg = HourGlass(seconds=2, visibility=True, target=target).start()
+    sleep(2.1)
+def target_test2():
+    hg = HourGlass(seconds=2, visibility=True, target=target2, args=(2,)).start()
+    sleep(2.1)
+
 # Error tests
+def target_error():
+    hg = HourGlass(seconds=2, visibility=True, args=(1,)).start()
+
 def comparative_error():
     hg1 = HourGlass(seconds=5, visibility=True).start()
     sleep(0.5)
@@ -54,14 +70,29 @@ def comparative_error():
     sleep(5)
 
 if __name__ == "__main__":
-    print("\nTeste 1:")
-    hourglass_test()
-    sleep(1)
-    print("\nTeste 2:")
-    comparative_tests()
-    sleep(1)
-    print("\nTeste 3:")
-    func_tests()
-    sleep(1)
-    print("\nTeste 4:")
-    comparative_error()
+    try:
+        print("\nTest 1:")
+        hourglass_test()
+        sleep(1)
+        print("\nTest 2:")
+        comparative_tests()
+        sleep(1)
+        print("\nTest 3:")
+        func_tests()
+        sleep(1)
+        print("\nTarget Tests:")
+        print("\n1:")
+        target_test()
+        sleep(1)
+        print("\n2:")
+        target_test2()
+        sleep(1)
+        print("\nError tests:")
+        print("\n1:")
+        target_error()
+        sleep(1)
+        print("\n2:")
+        comparative_error()
+    except Exception as e:
+        print(f"Error: {e}")
+        sleep(5)
