@@ -198,6 +198,12 @@ class HourGlass:
             raise AttributeError(f"There is no hourglass running!")
         else:
             return int(self.__pid)
+    
+    def is_active(self) -> bool:
+        """
+        Check if the alarm is active
+        """
+        return self.__pid and pid_exists(self.__pid)
         
 if __name__ == "__main__":
     pass

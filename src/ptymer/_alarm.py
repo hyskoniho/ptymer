@@ -121,5 +121,20 @@ class Alarm():
         
         print("Alarm stopped!") if self.visibility else None
 
+    def get_pid(self) -> int:
+        """
+        Return the process id
+        """
+        if not self.__pid or not pid_exists(self.__pid):
+            raise AttributeError(f"There is no hourglass running!")
+        else:
+            return int(self.__pid)
+
+    def is_active(self) -> bool:
+        """
+        Check if the alarm is active
+        """
+        return self.__pid and pid_exists(self.__pid)
+
 if __name__ == "__main__":
     pass
