@@ -114,7 +114,7 @@ class Alarm():
         """
         Execute the stored function with its arguments.
 
-        This method attempts to run the function stored in `self.__func` with the arguments stored in `self.__args`.
+        This method attempts to run the function stored in `self.target` with the arguments stored in `self.args`.
         If no arguments are provided, the function is called without arguments.
 
         Returns:
@@ -123,21 +123,21 @@ class Alarm():
 
         Raises:
             Exception: If an error occurs during the function execution, the exception is caught and its message is printed
-            if `self.__visibility` is `True`.
+            if `self.visibility` is `True`.
 
         Notes:
-            - If `self.__func` is `None`, the method returns `None`.
-            - If `self.__args` is `None`, the function is called without arguments.
+            - If `self.target` is `None`, the method returns `None`.
+            - If `self.args` is `None`, the function is called without arguments.
         """
         try:
-            if self.__func and self.__args:
-                value = self.__func(*self.__args)
-            elif self.__func and not self.__args:
-                value = self.__func()
+            if self.target and self.args:
+                value = self.target(*self.args)
+            elif self.target and not self.args:
+                value = self.target()
             else:
                 value = None
         except Exception as e:
-            print(f"Error ocurred:\n{e}") if self.__visibility else None
+            print(f"Error ocurred:\n{e}") if self.visibility else None
             return str(e)
         else:
             return value
