@@ -5,17 +5,18 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ptymer"
 version = "0.0.1"
-authors = [
-  { name="Caio Lima", email="caio-augusto@live.com" },
-]
+authors = [{ name="Caio Lima", email="caio-augusto@live.com" }]
+license = { file = "LICENSE" }
 description = "Ptymer is a lightweight Python package designed to help developers manage and monitor the execution time of their code. With features like timers and countdowns, it allows you to precisely measure runtime durations and set time-based triggers. Whether you need to benchmark performance or execute actions at specific intervals, Ptymer provides a simple and efficient solution"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
+    "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+keywords = ["timer", "countdown", "hourglass", "alarm"]
 dependencies = [
     "psutil>=6.0.0",
     "python-dateutil>=2.9.0.post0",

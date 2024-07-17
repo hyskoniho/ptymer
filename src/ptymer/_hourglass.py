@@ -129,7 +129,6 @@ class HourGlass:
         hours, mins = divmod(mins, 60)
  
         time_str = f"{int(hours)} {int(mins)} {float(secs):.2f}"
-        print(time_str)
         return datetime.strptime(time_str, "%H %M %S.%f").time()
     
     def run_function(self) -> any:
