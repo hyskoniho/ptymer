@@ -8,8 +8,7 @@ class HourGlass:
                  seconds: Union[int, float], 
                  target: Optional[Callable] = None,
                  args: Optional[tuple] = None,
-                 visibility: bool = False,
-                 persist: bool = False) -> None:
+                 visibility: bool = False) -> None:
         """
         Initialize the hourglass timer.
 
@@ -18,10 +17,9 @@ class HourGlass:
             target (Optional[Callable]): A callable function to be executed when the timer ends. Default is None.
             args (Optional[tuple]): A tuple of arguments to pass to the target function. Default is None.
             visibility (bool): Determines if messages should be displayed. Default is False.
-            persist (bool): If True, the secondary process will not be interrupted when the main process is interrupted. Default is False.
 
         Raises:
-            TypeError: If `visibility` is not a boolean, if `seconds` is not numeric, if `target` is not a callable, if `args` is not a tuple, or if `persist` is not a boolean.
+            TypeError: If `visibility` is not a boolean, if `seconds` is not numeric, if `target` is not a callable or if `args` is not a tuple.
             ValueError: If `seconds` is less than 1, or if `args` are defined without a target function.
 
         Notes:
@@ -30,7 +28,6 @@ class HourGlass:
             - The `__pid` attribute stores the process ID of the hourglass.
             - The `target` attribute is the function to be executed when the timer ends.
             - The `args` attribute contains the arguments for the `target` function.
-            - The `persist` attribute determines if the secondary process should persist.
         """
         if not isinstance(visibility, bool):
             raise TypeError(f"Visibility must be a boolean! Got {type(self.__visibility)}!") 
@@ -59,13 +56,8 @@ class HourGlass:
         else: self.__args: tuple = args
         # Arguments of the function
 
-        if not isinstance(persist, bool):
-            raise TypeError(f"Persist must be a boolean! Got {type(persist)}!")
-        else: self.__persist: bool = persist
-        # If True, the secondary process will not be interrupted when the main process is interrupted 
-
     def __str__(self) -> str:
-        return f"Class HourGlass()\nVisibility: {self.__visibility}\nRemaining time: {self.__total_time.value}\nProcess id: {self.__pid if self.__pid and pid_exists(self.__pid) else None}\nFunction: {self.__func}\nArguments: {self.__args}\nPersist: {self.__persist}\n"
+        return f"Class HourGlass()\nVisibility: {self.__visibility}\nRemaining time: {self.__total_time.value}\nProcess id: {self.__pid if self.__pid and pid_exists(self.__pid) else None}\nFunction: {self.__func}\nArguments: {self.__args}\n"
     
     def __eq__(self, other: "HourGlass") -> bool:
         if isinstance(other, HourGlass):
@@ -189,7 +181,7 @@ class HourGlass:
         process = psProcess(mainPid)
 
         try:
-            while self.__total_time.value > 0 and (pid_exists(mainPid) or self.__persist):
+            while self.__total_time.value > 0 and pid_exists(mainPid):
                 self.__total_time.value-=1
                 sleep(1)
             # Decrease time in 1 second and sleep for 1 second (main 

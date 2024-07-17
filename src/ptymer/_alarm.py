@@ -15,7 +15,7 @@ class Alarm():
     # arguments of the function
     visibility: bool = False
     # defines if the alarm will show messages or not
-    persist: bool = False
+    keep_schedules: bool = False
     # if true, the alarm will not be elimnated after being triggered
     __pid: Optional[int] = None
     # process id of the alarm
@@ -30,7 +30,7 @@ class Alarm():
 
         Raises:
             TypeError: If `schedules` is not a list, if `target` is not a callable function, 
-                    if `args` is not a tuple, if `visibility` is not a boolean, if `persist` 
+                    if `args` is not a tuple, if `visibility` is not a boolean, if `keep_schedules` 
                     is not a boolean, or if any schedule entry is not a valid date.
             ValueError: If `schedules` is empty, if `target` is not defined, or if `args` 
                         are defined without a target function.
@@ -39,7 +39,7 @@ class Alarm():
             - `schedules` should be a list of dates in `datetime`, `tuple`, or `str` format.
             - `target` should be a callable function.
             - `args` should be a tuple of arguments for the target function.
-            - `visibility` and `persist` should be boolean values.
+            - `visibility` and `keep_schedules` should be boolean values.
             - The method converts string dates to `datetime` objects and tuple dates to 
             `datetime` objects, truncating microseconds for `datetime` objects.
         """
@@ -55,8 +55,8 @@ class Alarm():
             raise ValueError(f"Arguments cannot be defined without a target function!")
         elif not isinstance(self.visibility, bool):
             raise TypeError("Visibility must be a boolean!")
-        elif not isinstance(self.persist, bool):
-            raise TypeError("Persist must be a boolean!")
+        elif not isinstance(self.keep_schedules, bool):
+            raise TypeError("keep_schedules must be a boolean!")
         else:
             for idx, date_obj in enumerate(self.schedules):
                 try:
@@ -75,7 +75,7 @@ class Alarm():
                     pass
 
     def __str__(self) -> str:
-        return f"Class Alarm()\nVisibility: {self.visibility}\nSchedules:\n {[str(schedule) for schedule in self.schedules]}\nTarget function: {self.target}\nArguments:\n {[arg +': ' + str(type(arg)) for arg in self.args]}\nPersist: {self.persist}\nProcess id: {self.__pid if self.__pid and pid_exists(self.__pid) else None}\n"
+        return f"Class Alarm()\nVisibility: {self.visibility}\nSchedules:\n {[str(schedule) for schedule in self.schedules]}\nTarget function: {self.target}\nArguments:\n {[arg +': ' + str(type(arg)) for arg in self.args]}\nkeep_schedules: {self.keep_schedules}\nProcess id: {self.__pid if self.__pid and pid_exists(self.__pid) else None}\n"
     
     def start(self) -> "Alarm":
         """
@@ -158,14 +158,14 @@ class Alarm():
         Notes:
             - The function continuously checks the current time against scheduled alarm times.
             - When the current time matches a scheduled time, the main process is suspended, the alarm function is executed, and then the main process is resumed.
-            - If `self.persist` is `False`, the schedule is removed after the alarm is triggered.
+            - If `self.keep_schedules` is `False`, the schedule is removed after the alarm is triggered.
             - The function stops running when there are no more schedules or if the main process no longer exists.
         """
         from time import sleep
         process = psProcess(mainPid)
         lastIdx = None
 
-        while len(self.schedules) > 0 and (pid_exists(mainPid) or self.__persist):
+        while len(self.schedules) > 0 and (pid_exists(mainPid) or self.keep_schedules):
             now = datetime.now().replace(microsecond=0)
             try:
                 idx = self.schedules.index(now)
@@ -178,7 +178,7 @@ class Alarm():
                     self.run_function()
                     process.resume()
                     lastIdx = idx
-                    self.schedules.pop(idx) if not self.persist else None
+                    self.schedules.pop(idx) if not self.keep_schedules else None
                 else:
                     continue
             

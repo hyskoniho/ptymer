@@ -26,8 +26,7 @@ def attr_acss():
      print(alarm.schedules)
 
 def alarm_wait():
-    alarm = Alarm(schedules=["14:18:00"], visibility=True, persist=True).start()
-    sleep(100)
+    alarm = Alarm(schedules=["14:29:00"], visibility=True, keep_schedules=True).start()
 if __name__ == "__main__":
     print("\nTeste 1:")
     alarm_test()
