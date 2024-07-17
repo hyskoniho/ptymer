@@ -5,7 +5,7 @@
   <img src="https://img.shields.io/badge/license-MIT-yellow?style=for-the-badge">
 </div>
 
-**PTymer** is a Python project that provides insights and actions within the execution of code in a time context. This package includes three main classes: `Timer`, `HourGlass`, and `Alarm`, each with specific functionalities for time monitoring and control.
+**PTymer** is a Python project that provides insights and actions within the execution of code in a time context. This package includes three main classes: `Timer`, `HourGlass`, and `Alarm`, each with specific functionalities for time monitoring and control. You can find the full description in the [Wiki Page](https://github.com/hyskoniho/ptymer/wiki)
 
 ## Index
 
