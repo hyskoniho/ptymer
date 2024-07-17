@@ -3,12 +3,11 @@ from typing import Callable, Any, List, Tuple, Union, Optional
 from dataclasses import dataclass
 from dateutil import parser
 from psutil import Process as psProcess, pid_exists
-from time import sleep
 from multiprocessing import Process, freeze_support
 
 @dataclass
 class Alarm():
-    schedules: List[Union[datetime, str, Tuple[int, int, int, int, int, int]]]
+    schedules: List[Union[datetime, str, Tuple[int, int, int]]]
     # list of datetime objects
     target: Optional[Callable] = None
     # function that will be executed when the alarm is triggered
@@ -48,8 +47,6 @@ class Alarm():
             raise TypeError("Schedules must be a list!")
         elif not self.schedules:
             raise ValueError("Schedules must be defined!")
-        elif not self.target:
-            raise ValueError("Target function must be defined!")
         elif self.target and not isinstance(self.target, Callable):
             raise TypeError("Target must be a function!")
         elif self.args and not isinstance(self.args, tuple):
@@ -164,23 +161,26 @@ class Alarm():
             - If `self.persist` is `False`, the schedule is removed after the alarm is triggered.
             - The function stops running when there are no more schedules or if the main process no longer exists.
         """
+        from time import sleep
         process = psProcess(mainPid)
+        lastIdx = None
 
-        while len(self.schedules) > 0 and pid_exists(mainPid):
+        while len(self.schedules) > 0 and (pid_exists(mainPid) or self.__persist):
             now = datetime.now().replace(microsecond=0)
             try:
                 idx = self.schedules.index(now)
             except:
-                sleep(0.1)
                 continue
             else:
-                print("Alarm finished!") if self.visibility else None
-
-                process.suspend()
-                self.run_function()
-                process.resume()
-
-                self.schedules.pop(idx) if not self.persist else None
+                if idx != lastIdx:
+                    print("Alarm triggered!") if self.visibility else None
+                    process.suspend()
+                    self.run_function()
+                    process.resume()
+                    lastIdx = idx
+                    self.schedules.pop(idx) if not self.persist else None
+                else:
+                    continue
             
         self.__pid = None
     

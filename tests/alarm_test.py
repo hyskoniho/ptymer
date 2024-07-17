@@ -17,7 +17,7 @@ def target():
         print("Alarm!")
 
 def alarm_test():    
-    alarm = Alarm(target=target, args=(), schedules=["10:49:00"], visibility=True).start()
+    alarm = Alarm(target=target, args=(), schedules=["13:54:00"], visibility=True).start()
     alarm.stop()
 
 def attr_acss():
@@ -25,9 +25,15 @@ def attr_acss():
      alarm.schedules = ["10:50:00"]
      print(alarm.schedules)
 
+def alarm_wait():
+    alarm = Alarm(schedules=["14:18:00"], visibility=True, persist=True).start()
+    sleep(100)
 if __name__ == "__main__":
     print("\nTeste 1:")
     alarm_test()
     sleep(1)
     print("\nTeste 2:")
     attr_acss()
+    sleep(1)
+    print("\nTeste 3:")
+    alarm_wait()
