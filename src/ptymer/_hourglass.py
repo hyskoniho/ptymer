@@ -26,6 +26,7 @@ class HourGlass:
             - The `visibility` attribute defines if the hourglass will show messages or not.
             - The `seconds` attribute represents the total time of the hourglass.
             - The `__pid` attribute stores the process ID of the hourglass.
+            - The `__process` attribute stores the process of the hourglass.
             - The `target` attribute is the function to be executed when the timer ends.
             - The `args` attribute contains the arguments for the `target` function.
         """
@@ -44,6 +45,9 @@ class HourGlass:
         self.__pid: Optional[int] = None
         # Process id of the hourglass
 
+        self.__process: Optional[Process] = None
+        # Process of the hourglass
+
         if target and not isinstance(target, Callable):
             raise TypeError(f"Target must be a function! Got {type(target)}!")
         else: self.__func: Callable = target
@@ -57,7 +61,7 @@ class HourGlass:
         # Arguments of the function
 
     def __str__(self) -> str:
-        return f"Class HourGlass()\nVisibility: {self.__visibility}\nRemaining time: {self.__total_time.value}\nProcess id: {self.__pid if self.__pid and pid_exists(self.__pid) else None}\nFunction: {self.__func}\nArguments: {self.__args}\n"
+        return f"Class HourGlass()\nVisibility: {self.__visibility}\nRemaining time: {self.__total_time.value}\nProcess id: {self.__pid if self.is_active() else None}\nFunction: {self.__func}\nArguments: {self.__args}\n"
     
     def __eq__(self, other: "HourGlass") -> bool:
         if isinstance(other, HourGlass):
@@ -220,7 +224,7 @@ class HourGlass:
         freeze_support()
         # Freeze support for Windows
 
-        if self.__pid and pid_exists(self.__pid):
+        if self.is_active():
             raise RuntimeError(f"Hourglass already running!")
         else:
             print("Starting hourglass!") if self.__visibility else None
@@ -230,6 +234,7 @@ class HourGlass:
             # Start the parallel process
 
             self.__pid = process.pid
+            self.__process = process
 
             return self
         
@@ -247,12 +252,13 @@ class HourGlass:
             - The method checks if the hourglass process ID is set and if the process exists.
             - If `self.__visibility` is `True`, it prints a message indicating that the hourglass has stopped.
         """
-        if not self.__pid or not pid_exists(self.__pid):
+        if not self.is_active():
             raise AttributeError(f"There is no hourglass running!")
         else:
             process = psProcess(self.__pid)
             process.terminate()
             self.__pid = None
+            self.__process = None
             if self.__visibility:
                 print("Hourglass stopped!")
     
@@ -273,7 +279,7 @@ class HourGlass:
             - If `self.__visibility` is `True`, it prints the remaining time.
             - The remaining time is formatted as a `datetime.time` object.
         """
-        if not self.__pid or not pid_exists(self.__pid):
+        if not self.is_active():
             raise AttributeError(f"There is no hourglass running!")
         else:
             val = self._time_format(self.__total_time.value)
@@ -297,7 +303,7 @@ class HourGlass:
             - If `self.__visibility` is `True`, it prints the remaining seconds.
             - The method converts the remaining time from a `datetime.time` object to seconds.
         """
-        if not self.__pid or not pid_exists(self.__pid):
+        if not self.is_active():
             raise AttributeError(f"There is no hourglass running!")
         else:
             dateobj = self._time_format(self.__total_time.value)
@@ -321,7 +327,7 @@ class HourGlass:
         Raises:
             AttributeError: If no hourglass process is currently running.
         """
-        if not self.__pid or not pid_exists(self.__pid):
+        if not self.is_active():
             raise AttributeError(f"There is no hourglass running!")
         else:
             return int(self.__pid)
@@ -337,6 +343,23 @@ class HourGlass:
             bool: `True` if the hourglass process is active, `False` otherwise.
         """
         return self.__pid and pid_exists(self.__pid)
+    
+    def wait(self) -> None:
+        """
+        Wait for the alarm to finish.
+
+        This method waits for the alarm process to finish before returning.
+
+        Returns:
+            None
+
+        Notes:
+            - The method uses the `join()` method of the alarm process.
+        """
+        if self.is_active():
+            self.__process.join()
+        else:
+            raise RuntimeError("Alarm not set!")
         
 if __name__ == "__main__":
     pass

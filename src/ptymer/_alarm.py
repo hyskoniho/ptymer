@@ -19,6 +19,8 @@ class Alarm():
     # if true, the alarm will not be elimnated after being triggered
     __pid: Optional[int] = None
     # process id of the alarm
+    __process: Optional[Process] = None
+    # process object of the alarm
 
     def __post_init__(self) -> None:
         """
@@ -75,7 +77,7 @@ class Alarm():
                     pass
 
     def __str__(self) -> str:
-        return f"Class Alarm()\nVisibility: {self.visibility}\nSchedules:\n {[str(schedule) for schedule in self.schedules]}\nTarget function: {self.target}\nArguments:\n {[arg +': ' + str(type(arg)) for arg in self.args]}\nkeep_schedules: {self.keep_schedules}\nProcess id: {self.__pid if self.__pid and pid_exists(self.__pid) else None}\n"
+        return f"Class Alarm()\nVisibility: {self.visibility}\nSchedules:\n {[str(schedule) for schedule in self.schedules]}\nTarget function: {self.target}\nArguments:\n {[arg +': ' + str(type(arg)) for arg in self.args]}\nKeep_schedules: {self.keep_schedules}\nProcess id: {self.__pid if self.is_active() else None}\n"
     
     def start(self) -> "Alarm":
         """
@@ -99,12 +101,15 @@ class Alarm():
         freeze_support()
         # Freeze support for windows
 
-        if self.__pid and pid_exists(self.__pid):
+        if self.is_active():
             raise ValueError("Alarm already set!")
         else:
             process = Process(target=self._alarm_loop, args=(getpid(),), daemon=True)
             process.start()
             self.__pid = process.pid
+            self.__process = process
+            
+            print("Alarm started!") if self.visibility else None
             return self
         
     def run_function(self) -> any:
@@ -120,7 +125,6 @@ class Alarm():
 
         Raises:
             Exception: If an error occurs during the function execution, the exception is caught and its message is printed
-            if `self.visibility` is `True`.
 
         Notes:
             - If `self.target` is `None`, the method returns `None`.
@@ -134,7 +138,7 @@ class Alarm():
             else:
                 value = None
         except Exception as e:
-            print(f"Error ocurred:\n{e}") if self.visibility else None
+            print(f"Error ocurred:\n{e}")
             return str(e)
         else:
             return value
@@ -198,10 +202,11 @@ class Alarm():
             - The method checks if the alarm process exists and terminates it if so.
             - If `self.visibility` is `True`, it prints a message indicating that the alarm has stopped.
         """
-        if self.__pid and pid_exists(self.__pid):
+        if self.is_active():
             process = psProcess(self.__pid)
             process.terminate()
             self.__pid = None
+            self.__process = None
         else:
             raise RuntimeError("Alarm not set!")
         
@@ -223,7 +228,7 @@ class Alarm():
         Notes:
             - The method checks if the alarm process ID is set and if the process exists.
         """
-        if not self.__pid or not pid_exists(self.__pid):
+        if not self.is_active():
             raise AttributeError(f"There is no hourglass running!")
         else:
             return int(self.__pid)
@@ -242,5 +247,22 @@ class Alarm():
         """
         return self.__pid and pid_exists(self.__pid)
 
+    def wait(self) -> None:
+        """
+        Wait for the alarm to finish.
+
+        This method waits for the alarm process to finish before returning.
+
+        Returns:
+            None
+
+        Notes:
+            - The method uses the `join()` method of the alarm process.
+        """
+        if self.is_active():
+            self.__process.join()
+        else:
+            raise RuntimeError("Alarm not set!")
+        
 if __name__ == "__main__":
     pass
