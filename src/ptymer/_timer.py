@@ -25,7 +25,7 @@ class Timer(ContextDecorator):
         else: self.__visibility: bool = visibility
 
     def __str__(self) -> str:
-        return f"Class Timer()\nVisibility: {self.__visibility}\nStatus: {'on' if self.__start_time else 'off'}\nStart time: {str(self.__start_time)}\nTime since start: {str(self.current_time())}\nQuantity of marks: {len(self.__marks)}\n"
+        return f"Class Timer()\nVisibility: {self.__visibility}\nActive: {self.is_active}\nStart time: {str(self.__start_time)}\nTime since start: {str(self.current_time())}\nQuantity of marks: {len(self.__marks)}\n"
     
     def __enter__(self) -> "Timer":
         """
@@ -37,7 +37,7 @@ class Timer(ContextDecorator):
         Returns:
             Timer: The Timer instance itself.
         """
-        if self.__start_time:
+        if self.is_active():
             raise RuntimeError(f"Timer already executing!")
         else:
             self.start()
@@ -59,7 +59,7 @@ class Timer(ContextDecorator):
         Notes:
             - If no exception occurred (`exc_type` is `None`), the timer is stopped.
         """
-        if not self.__start_time:
+        if not self.is_active():
             raise AttributeError(f"There is no timer executing!")
         elif exc_type:
             raise exc_type(exc_value)
@@ -138,7 +138,7 @@ class Timer(ContextDecorator):
             - Sets `self.__start_time` to the current timestamp using `datetime.now()`.
             - If `self.__visibility` is `True`, prints the formatted start time using `_time_format(0)`.
         """
-        if self.__start_time:
+        if self.is_active():
             raise RuntimeError(f"Timer already executing!")
         else:
             self.__start_time = datetime.now()
@@ -160,7 +160,7 @@ class Timer(ContextDecorator):
             - Resets `self.__start_time` to `None` after stopping the timer.
             - If `self.__visibility` is `True`, prints the formatted end time and lists any recorded marks.
         """
-        if not self.__start_time:
+        if not self.is_active():
             raise AttributeError(f"There is no timer executing!")
         else:
             end_time = self._time_format((datetime.now() - self.__start_time).total_seconds())
@@ -186,12 +186,12 @@ class Timer(ContextDecorator):
             - Resets `self.__marks` to an empty list.
             - If `self.__visibility` is `True`, prints the timestamp of the restart.
         """
-        if not self.__start_time:
+        if not self.is_active():
             raise RuntimeError(f"There is no timer running!")
         else:
             now = datetime.now()
             if self.__visibility:
-                print(f"Restarting point: {now}")
+                print(f"Restarting timer!")
             self.__start_time = now
             self.__marks = []
     
@@ -209,7 +209,7 @@ class Timer(ContextDecorator):
             - Calculates the elapsed time from `self.__start_time` to the current time.
             - Returns the formatted time using `_time_format` method.
         """
-        if not self.__start_time:
+        if not self.is_active():
             raise AttributeError(f"There is no timer executing!")
         else:
             return self._time_format((datetime.now() - self.__start_time).total_seconds())
@@ -228,7 +228,7 @@ class Timer(ContextDecorator):
             - Adds a new mark to `self.__marks` consisting of the current time and the observation.
             - If `self.__visibility` is `True`, prints the mark number, current time, and observation.
         """
-        if not self.__start_time:
+        if not self.is_active():
             raise AttributeError(f"There is no timer executing!")
         else:
             if self.__visibility:
@@ -266,6 +266,18 @@ class Timer(ContextDecorator):
             - Prints the formatted current time with a descriptive label.
         """
         print(f"Current time: {str(self.current_time())}")
+
+    def is_active(self) -> bool:
+        """
+        Check if the timer is active.
+
+        This method returns a boolean indicating whether the timer is currently 
+        running.
+
+        Returns:
+            bool: `True` if the timer is active, `False` otherwise.
+        """
+        return self.__start_time is not None
 
 if __name__ == "__main__":
     pass
