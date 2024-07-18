@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from contextlib import ContextDecorator
-from typing import Optional, Union, Dict, Tuple
+from typing import Optional, Dict, Tuple
 
 class Timer(ContextDecorator):
     def __init__(self, visibility: bool = False) -> None:
@@ -25,7 +25,7 @@ class Timer(ContextDecorator):
         else: self.visibility: bool = visibility
 
     def __str__(self) -> str:
-        return f"Class Timer()\nVisibility: {self.visibility}\nActive: {self.is_active()}\nStart time: {str(self.__start_time)}\nTime since start: {str(self.current_time())}\nQuantity of marks: {len(self.__marks)}\n"
+        return f"Class Timer()\nVisibility: {self.visibility}\nActive: {self.status}\nStart time: {str(self.__start_time)}\nTime since start: {str(self.current_time())}\nQuantity of marks: {len(self.__marks)}\n"
     
     def __enter__(self) -> "Timer":
         """
@@ -37,7 +37,7 @@ class Timer(ContextDecorator):
         Returns:
             Timer: The Timer instance itself.
         """
-        if self.is_active():
+        if self.status:
             raise RuntimeError(f"Timer already executing!")
         else:
             self.start()
@@ -61,7 +61,7 @@ class Timer(ContextDecorator):
         """
         if exc_type:
             raise exc_type(exc_value)
-        elif not self.is_active():
+        elif not self.status:
             raise AttributeError(f"There is no timer executing!")
         else:
             self.stop()
@@ -109,7 +109,7 @@ class Timer(ContextDecorator):
         Notes:
             - Sets `self.__start_time` to the current timestamp using `datetime.now()`.
         """
-        if self.is_active():
+        if self.status:
             raise RuntimeError(f"Timer already executing!")
         else:
             self.__start_time = datetime.now()
@@ -131,7 +131,7 @@ class Timer(ContextDecorator):
             - Resets `self.__start_time` to `None` after stopping the timer.
             - If `self.visibility` is `True`, prints the formatted end time and lists any recorded marks.
         """
-        if not self.is_active():
+        if not self.status:
             raise AttributeError(f"There is no timer executing!")
         else:
             end_time = datetime.now() - self.__start_time
@@ -157,7 +157,7 @@ class Timer(ContextDecorator):
             - Resets `self.__marks` to an empty list.
             - If `self.visibility` is `True`, prints the restart message.
         """
-        if not self.is_active():
+        if not self.status:
             raise RuntimeError(f"There is no timer executing!")
         else:
             now = datetime.now()
@@ -180,7 +180,7 @@ class Timer(ContextDecorator):
             - Calculates the elapsed time from `self.__start_time` to the current time.
             - Returns the formatted time using `_time_format` method.
         """
-        if not self.is_active():
+        if not self.status:
             raise AttributeError(f"There is no timer executing!")
         else:
             return datetime.now() - self.__start_time
@@ -199,14 +199,15 @@ class Timer(ContextDecorator):
             - Adds a new mark to `self.__marks` consisting of the current time and the observation.
             - If `self.visibility` is `True`, prints the mark number, current time, and observation.
         """
-        if not self.is_active():
+        if not self.status:
             raise AttributeError(f"There is no timer executing!")
         else:
             if self.visibility:
                 print(f"Mark {len(self.__marks)+1}! \nTime since the beginning: \t{str(self.current_time())}" + (f"\nTime since previous mark: \t{self.current_time()-self.__marks[-1][0]}" if len(self.__marks) > 0 else "") + (f"\nObs: {observ}" if observ else ""))
             self.__marks.append([self.current_time(), observ if observ else ""])
 
-    def list_marks(self) -> Dict[int, Tuple[str, timedelta]]:
+    @property
+    def marks(self) -> Dict[int, Tuple[str, timedelta]]:
         """
         Return a dictionary with the marks and their respective times.
 
@@ -225,7 +226,8 @@ class Timer(ContextDecorator):
             raise AttributeError(f"There are no marks to show!")
         return {idx: [sublist[0], sublist[1]] for idx, sublist in enumerate(self.__marks)}
 
-    def is_active(self) -> bool:
+    @property
+    def status(self) -> bool:
         """
         Check if the timer is active.
 
