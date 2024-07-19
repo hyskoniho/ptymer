@@ -1,6 +1,6 @@
 from typing import Callable, Optional, Union
 from multiprocessing import Process, Value, freeze_support
-from datetime import datetime
+from datetime import datetime, timedelta
 from psutil import Process as psProcess, pid_exists
 
 class HourGlass:
@@ -100,18 +100,18 @@ class HourGlass:
         return self
     
     @staticmethod
-    def _time_format(secs: Union[int, float]) -> datetime.time:
+    def _time_format(secs: Union[int, float]) -> timedelta:
         """
-        Convert seconds to a `datetime.time` object.
+        Convert seconds to a `timedelta` object.
 
-        This method takes a number of seconds and converts it to a `datetime.time` object, 
+        This method takes a number of seconds and converts it to a `timedelta` object, 
         representing the equivalent hours, minutes, and seconds.
 
         Args:
             secs (Union[int, float]): The number of seconds to convert.
 
         Returns:
-            datetime.time: A `datetime.time` object representing the equivalent time.
+            timedelta: A `timedelta` object representing the equivalent time.
 
         Raises:
             ValueError: If the provided seconds cannot be converted to a valid time.
@@ -123,9 +123,9 @@ class HourGlass:
         """
         mins, secs = divmod(secs, 60)
         hours, mins = divmod(mins, 60)
+        days, hours = divmod(hours, 24)
  
-        time_str = f"{int(hours)} {int(mins)} {float(secs):.2f}"
-        return datetime.strptime(time_str, "%H %M %S.%f").time()
+        return timedelta(days=days, hours=hours, minutes=mins, seconds=secs)
     
     def run_function(self) -> any:
         """
@@ -262,22 +262,22 @@ class HourGlass:
             if self.__visibility:
                 print("Hourglass stopped!")
     
-    def remaining_time(self) -> datetime.time:
+    def remaining_time(self) -> timedelta:
         """
-        Show the remaining time in `datetime.time` format (HH:MM:SS.ms).
+        Show the remaining time in `timedelta` format (HH:MM:SS.ms).
 
-        This method returns the remaining time of the hourglass as a `datetime.time` object.
+        This method returns the remaining time of the hourglass as a `timedelta` object.
         If no hourglass process is running, it raises an error.
 
         Returns:
-            datetime.time: The remaining time of the hourglass.
+            timedelta: The remaining time of the hourglass.
 
         Raises:
             AttributeError: If no hourglass process is currently running.
 
         Notes:
             - If `self.__visibility` is `True`, it prints the remaining time.
-            - The remaining time is formatted as a `datetime.time` object.
+            - The remaining time is formatted as a `timedelta` object.
         """
         if not self.is_active():
             raise AttributeError(f"There is no hourglass running!")
@@ -286,7 +286,7 @@ class HourGlass:
             print(f"Remaining time: {str(val)}") if self.__visibility else None  
             return val
     
-    def remaining_seconds(self) -> int:
+    def remaining_seconds(self) -> Union[int, float]:
         """
         Show the remaining time in seconds.
 
@@ -294,25 +294,15 @@ class HourGlass:
         process is running, it raises an error.
 
         Returns:
-            int: The remaining time in seconds.
+            int | float: The remaining time in seconds.
 
         Raises:
             AttributeError: If no hourglass process is currently running.
-
-        Notes:
-            - If `self.__visibility` is `True`, it prints the remaining seconds.
-            - The method converts the remaining time from a `datetime.time` object to seconds.
         """
         if not self.is_active():
             raise AttributeError(f"There is no hourglass running!")
         else:
-            dateobj = self._time_format(self.__total_time.value)
-
-            total = int(dateobj.strftime('%S'))
-            total += int(dateobj.strftime('%M')) * 60
-            total += int(dateobj.strftime('%H')) * 60 * 60
-            print(f"Remaining seconds: {total}") if self.__visibility else None
-            return total
+            return self.__total_time.value
 
     def get_pid(self) -> int:
         """
