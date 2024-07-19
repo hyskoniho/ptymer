@@ -1,7 +1,9 @@
-import sys
-sys.path.insert(1, r'.\src')
-
-from ptymer import Timer
+try:
+    from ptymer import Timer
+except ImportError:
+    import sys
+    sys.path.insert(1, r'.\src')
+    from ptymer import Timer
 from time import sleep
 
 #####################################################################

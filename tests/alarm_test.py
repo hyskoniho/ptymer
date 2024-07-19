@@ -1,7 +1,9 @@
-import sys
-sys.path.insert(1, r'.\src')
-
-from ptymer import Alarm
+try:
+    from ptymer import Alarm
+except ImportError:
+    import sys
+    sys.path.insert(1, r'.\src')
+    from ptymer import Alarm
 from time import sleep
 
 #####################################################################

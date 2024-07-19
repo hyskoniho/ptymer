@@ -1,7 +1,9 @@
-import sys
-sys.path.insert(1, r'.\src')
-
-from ptymer import HourGlass
+try:
+    from ptymer import HourGlass
+except ImportError:
+    import sys
+    sys.path.insert(1, r'.\src')
+    from ptymer import HourGlass
 from time import sleep
 
 #####################################################################

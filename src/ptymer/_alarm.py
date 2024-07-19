@@ -173,9 +173,8 @@ class Alarm():
             now = datetime.now().replace(microsecond=0)
             try:
                 idx = self.schedules.index(now)
-            except Exception as e:
-                print(f"Error ocurred:\n{e}")
-                raise e
+            except:
+                continue # if the current time is not in the schedules, it continues the loop
             else:
                 if idx != lastIdx: # this is due the speed of the loop, sometimes it triggers the same alarm twice (or much more)
                     print("Alarm triggered!") if self.visibility else None
