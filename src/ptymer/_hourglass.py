@@ -31,7 +31,7 @@ class HourGlass:
             - The `args` attribute contains the arguments for the `target` function.
         """
         if not isinstance(visibility, bool):
-            raise TypeError(f"Visibility must be a boolean! Got {type(self.visibility)}!") 
+            raise TypeError(f"Visibility must be a boolean! Got {type(visibility)}!") 
         else: self.visibility: bool = visibility
         # Defines if the hourglass will show messages or not
 
@@ -254,7 +254,7 @@ class HourGlass:
             - If `self.visibility` is `True`, it prints a message indicating that the hourglass has stopped.
         """
         if not self.status:
-            raise AttributeError(f"There is no hourglass running!")
+            raise RuntimeError(f"There is no hourglass running!")
         else:
             process = psProcess(self.__pid)
             process.terminate()
@@ -269,43 +269,27 @@ class HourGlass:
         Show the remaining time in `timedelta` format (HH:MM:SS.ms).
 
         This method returns the remaining time of the hourglass as a `timedelta` object.
-        If no hourglass process is running, it raises an error.
 
         Returns:
             timedelta: The remaining time of the hourglass.
 
-        Raises:
-            AttributeError: If no hourglass process is currently running.
-
         Notes:
-            - If `self.visibility` is `True`, it prints the remaining time.
             - The remaining time is formatted as a `timedelta` object.
         """
-        if not self.status:
-            raise AttributeError(f"There is no hourglass running!")
-        else:
-            val = self._time_format(self.__total_time.value)
-            print(f"Remaining time: {str(val)}") if self.visibility else None  
-            return val
+        val = self._time_format(self.__total_time.value) 
+        return val
     
     @property
     def remaining_seconds(self) -> Union[int, float]:
         """
         Show the remaining time in seconds.
 
-        This method returns the remaining time of the hourglass in seconds. If no hourglass 
-        process is running, it raises an error.
+        This method returns the remaining time of the hourglass in seconds.
 
         Returns:
             int | float: The remaining time in seconds.
-
-        Raises:
-            AttributeError: If no hourglass process is currently running.
         """
-        if not self.status:
-            raise AttributeError(f"There is no hourglass running!")
-        else:
-            return self.__total_time.value
+        return self.__total_time.value
 
     @property
     def pid(self) -> int:
@@ -337,24 +321,27 @@ class HourGlass:
         Returns:
             bool: `True` if the hourglass process is active, `False` otherwise.
         """
-        return self.__pid and pid_exists(self.__pid)
+        if self.__pid and pid_exists(self.__pid):
+            return True
+        else:
+            return False
     
     def wait(self) -> None:
         """
-        Wait for the alarm to finish.
+        Wait for the hourglass to finish.
 
-        This method waits for the alarm process to finish before returning.
+        This method waits for the hourglass process to finish before returning.
 
         Returns:
             None
 
         Notes:
-            - The method uses the `join()` method of the alarm process.
+            - The method uses the `join()` method of the HourGlass process.
         """
         if self.status:
             self.__process.join()
         else:
-            raise RuntimeError("Alarm not set!")
+            raise RuntimeError("HourGlass not set!")
         
 if __name__ == "__main__":
     pass

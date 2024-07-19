@@ -102,7 +102,7 @@ class Alarm():
         # Freeze support for windows
 
         if self.status:
-            raise ValueError("Alarm already set!")
+            raise RuntimeError("Alarm already set!")
         else:
             process = Process(target=self._alarm_loop, args=(getpid(),), daemon=True)
             process.start()
@@ -180,7 +180,7 @@ class Alarm():
                     print("Alarm triggered!") if self.visibility else None
 
                     process.suspend()
-                    self.run_function()
+                    self._run_function(self.target, self.args, self.visibility)
                     process.resume()
 
                     lastIdx = idx
@@ -230,7 +230,7 @@ class Alarm():
             - The method checks if the alarm process ID is set and if the process exists.
         """
         if not self.status:
-            raise AttributeError(f"There is no hourglass running!")
+            raise AttributeError(f"There is no alarm running!")
         else:
             return int(self.__pid)
 
@@ -247,7 +247,10 @@ class Alarm():
         Notes:
             - The method checks if the process ID is set and if the process exists.
         """
-        return self.__pid and pid_exists(self.__pid)
+        if self.__pid and pid_exists(self.__pid):
+            return True
+        else:
+            return False
 
     def wait(self) -> None:
         """

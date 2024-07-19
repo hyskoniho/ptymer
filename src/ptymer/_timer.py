@@ -138,7 +138,7 @@ class Timer(ContextDecorator):
             - If `self.visibility` is `True`, prints the formatted end time and lists any recorded marks.
         """
         if not self.status:
-            raise AttributeError(f"There is no timer executing!")
+            raise RuntimeError(f"There is no timer executing!")
         else:
             end_time = datetime.now() - self.__start_time
             self.__start_time = None
