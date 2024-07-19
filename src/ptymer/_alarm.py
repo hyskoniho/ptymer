@@ -7,7 +7,7 @@ from multiprocessing import Process, freeze_support
 
 @dataclass
 class Alarm():
-    schedules: List[Union[datetime, str, Tuple[int, int, int]]]
+    schedules: List[Union[datetime, str, Tuple[int, int, int, int, int, int, int]]]
     # list of datetime objects
     target: Optional[Callable] = None
     # function that will be executed when the alarm is triggered
@@ -77,7 +77,7 @@ class Alarm():
                     pass
 
     def __str__(self) -> str:
-        return f"Class Alarm()\nVisibility: {self.visibility}\nSchedules:\n {[str(schedule) for schedule in self.schedules]}\nTarget function: {self.target}\nArguments:\n {[arg +': ' + str(type(arg)) for arg in self.args]}\nKeep_schedules: {self.keep_schedules}\nProcess id: {self.__pid if self.is_active() else None}\n"
+        return f"Class Alarm()\nVisibility: {self.visibility}\nSchedules: {self.args}\nKeep_schedules: {self.keep_schedules}\nProcess id: {self.__pid if self.status else None}"
     
     def start(self) -> "Alarm":
         """
@@ -101,7 +101,7 @@ class Alarm():
         freeze_support()
         # Freeze support for windows
 
-        if self.is_active():
+        if self.status:
             raise ValueError("Alarm already set!")
         else:
             process = Process(target=self._alarm_loop, args=(getpid(),), daemon=True)
@@ -112,7 +112,8 @@ class Alarm():
             print("Alarm started!") if self.visibility else None
             return self
         
-    def run_function(self) -> any:
+    @staticmethod
+    def _run_function(target, args, visibility) -> any:
         """
         Execute the stored function with its arguments.
 
@@ -131,10 +132,10 @@ class Alarm():
             - If `self.args` is `None`, the function is called without arguments.
         """
         try:
-            if self.target and self.args:
-                value = self.target(*self.args)
-            elif self.target and not self.args:
-                value = self.target()
+            if target and args:
+                value = target(*args)
+            elif target and not args:
+                value = target()
             else:
                 value = None
         except Exception as e:
@@ -165,27 +166,27 @@ class Alarm():
             - If `self.keep_schedules` is `False`, the schedule is removed after the alarm is triggered.
             - The function stops running when there are no more schedules or if the main process no longer exists.
         """
-        from time import sleep
         process = psProcess(mainPid)
         lastIdx = None
 
-        while len(self.schedules) > 0 and (pid_exists(mainPid) or self.keep_schedules):
+        while len(self.schedules) > 0:
             now = datetime.now().replace(microsecond=0)
             try:
                 idx = self.schedules.index(now)
-            except:
-                continue
+            except Exception as e:
+                print(f"Error ocurred:\n{e}")
+                raise e
             else:
-                if idx != lastIdx:
+                if idx != lastIdx: # this is due the speed of the loop, sometimes it triggers the same alarm twice (or much more)
                     print("Alarm triggered!") if self.visibility else None
+
                     process.suspend()
                     self.run_function()
                     process.resume()
+
                     lastIdx = idx
-                    self.schedules.pop(idx) if not self.keep_schedules else None
-                else:
-                    continue
-            
+                    if not self.keep_schedules:
+                        self.schedules.pop(idx)  
         self.__pid = None
     
     def stop(self) -> None:
@@ -202,7 +203,7 @@ class Alarm():
             - The method checks if the alarm process exists and terminates it if so.
             - If `self.visibility` is `True`, it prints a message indicating that the alarm has stopped.
         """
-        if self.is_active():
+        if self.status:
             process = psProcess(self.__pid)
             process.terminate()
             self.__pid = None
@@ -212,7 +213,8 @@ class Alarm():
         
         print("Alarm stopped!") if self.visibility else None
 
-    def get_pid(self) -> int:
+    @property
+    def pid(self) -> int:
         """
         Get the process ID.
 
@@ -228,12 +230,13 @@ class Alarm():
         Notes:
             - The method checks if the alarm process ID is set and if the process exists.
         """
-        if not self.is_active():
+        if not self.status:
             raise AttributeError(f"There is no hourglass running!")
         else:
             return int(self.__pid)
 
-    def is_active(self) -> bool:
+    @property
+    def status(self) -> bool:
         """
         Check if the alarm is active.
 
@@ -259,7 +262,7 @@ class Alarm():
         Notes:
             - The method uses the `join()` method of the alarm process.
         """
-        if self.is_active():
+        if self.status:
             self.__process.join()
         else:
             raise RuntimeError("Alarm not set!")

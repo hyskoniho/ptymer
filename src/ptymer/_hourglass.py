@@ -155,12 +155,12 @@ class HourGlass:
             else:
                 value = None
         except Exception as e:
-            print(f"Error ocurred:\n{e}") if visibility else None
+            print(f"Error ocurred:\n{e}")
             return str(e)
         else:
             return value
     
-    def __decrease_time(self, mainPid: int) -> None:
+    def _decrease_time(self, mainPid: int) -> None:
         """
         Decrease the timer by 1 second increments.
 
@@ -230,7 +230,7 @@ class HourGlass:
         else:
             print("Starting hourglass!") if self.visibility else None
 
-            process = Process(target=self.__decrease_time, args=(getpid(),), daemon=True)
+            process = Process(target=self._decrease_time, args=(getpid(),), daemon=True)
             process.start()
             # Start the parallel process
 
