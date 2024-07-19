@@ -23,4 +23,4 @@ jobs:
           pip install -r requirements.txt
 
       - name: Unit Test
-        run: python -c "import sys; print(sys.version)"
+        run: pytest -v
