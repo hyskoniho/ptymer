@@ -74,7 +74,7 @@ class Timer(ContextDecorator):
         
     def __eq__(self, other: "Timer") -> bool:
         if isinstance(other, Timer):
-            return self.__start_time == other.__start_time
+            return abs(other.__start_time - self.__start_time) < timedelta(microseconds=100000)
         else: raise TypeError(f"Cannot compare HourGlass with {type(other)}!")
 
     def __ne__(self, other: "Timer") -> bool:
