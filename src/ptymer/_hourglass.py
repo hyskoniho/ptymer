@@ -1,6 +1,6 @@
 from typing import Callable, Optional, Union
 from multiprocessing import Process, Value, freeze_support
-from datetime import datetime, timedelta
+from datetime import timedelta
 from psutil import Process as psProcess, pid_exists
 
 class HourGlass:
@@ -31,8 +31,8 @@ class HourGlass:
             - The `args` attribute contains the arguments for the `target` function.
         """
         if not isinstance(visibility, bool):
-            raise TypeError(f"Visibility must be a boolean! Got {type(self.__visibility)}!") 
-        else: self.__visibility: bool = visibility
+            raise TypeError(f"Visibility must be a boolean! Got {type(self.visibility)}!") 
+        else: self.visibility: bool = visibility
         # Defines if the hourglass will show messages or not
 
         if not isinstance(seconds, (float, int)):
@@ -50,18 +50,18 @@ class HourGlass:
 
         if target and not isinstance(target, Callable):
             raise TypeError(f"Target must be a function! Got {type(target)}!")
-        else: self.__func: Callable = target
+        else: self.target: Callable = target
         # Function to be executed when time is up
 
         if args and not isinstance(args, tuple):
             raise TypeError(f"Arguments must be a tuple! Got {type(args)}!")
         elif args and not target:
             raise ValueError(f"Arguments cannot be defined without a target function!")
-        else: self.__args: tuple = args
+        else: self.args: tuple = args
         # Arguments of the function
 
     def __str__(self) -> str:
-        return f"Class HourGlass()\nVisibility: {self.__visibility}\nRemaining time: {self.__total_time.value}\nProcess id: {self.__pid if self.is_active() else None}\nFunction: {self.__func}\nArguments: {self.__args}\n"
+        return f"Class HourGlass()\nVisibility: {self.visibility}\nRemaining time: {self.__total_time.value}\nProcess id: {self.__pid if self.status else None}\nFunction: {self.target}\nArguments: {self.args}\n"
     
     def __eq__(self, other: "HourGlass") -> bool:
         if isinstance(other, HourGlass):
@@ -127,11 +127,12 @@ class HourGlass:
  
         return timedelta(days=days, hours=hours, minutes=mins, seconds=secs)
     
-    def run_function(self) -> any:
+    @staticmethod
+    def _run_function(target, args, visibility) -> any:
         """
         Execute the stored function with its arguments.
 
-        This method attempts to run the function stored in `self.__func` with the arguments stored in `self.__args`.
+        This method attempts to run the function stored in `self.target` with the arguments stored in `self.args`.
         If no arguments are provided, the function is called without arguments.
 
         Returns:
@@ -140,26 +141,26 @@ class HourGlass:
 
         Raises:
             Exception: If an error occurs during the function execution, the exception is caught and its message is printed
-            if `self.__visibility` is `True`.
+            if `self.visibility` is `True`.
 
         Notes:
-            - If `self.__func` is `None`, the method returns `None`.
-            - If `self.__args` is `None`, the function is called without arguments.
+            - If `target` is `None`, the method returns `None`.
+            - If `args` is `None`, the function is called without arguments.
         """
         try:
-            if self.__func and self.__args:
-                value = self.__func(*self.__args)
-            elif self.__func and not self.__args:
-                value = self.__func()
+            if target and args:
+                value = target(*args)
+            elif target and not args:
+                value = target()
             else:
                 value = None
         except Exception as e:
-            print(f"Error ocurred:\n{e}") if self.__visibility else None
+            print(f"Error ocurred:\n{e}") if visibility else None
             return str(e)
         else:
             return value
     
-    def _decrease_time(self, mainPid: int) -> None:
+    def __decrease_time(self, mainPid: int) -> None:
         """
         Decrease the timer by 1 second increments.
 
@@ -177,27 +178,27 @@ class HourGlass:
         Notes:
             - This method uses `sleep(1)` to wait for 1 second intervals between decreases.
             - If the timer runs out or the main process is interrupted, it prints a message if 
-            `self.__visibility` is `True`.
+            `self.visibility` is `True`.
             - The method suspends the main process, runs the target function, and then resumes the main process.
         """
         from time import sleep
-
-        process = psProcess(mainPid)
-
         try:
-            while self.__total_time.value > 0 and pid_exists(mainPid):
+            process = psProcess(mainPid)
+
+            while self.__total_time.value > 0:
                 self.__total_time.value-=1
                 sleep(1)
             # Decrease time in 1 second and sleep for 1 second (main 
             # process is not interrupted)
 
-            print("Time is up!" if pid_exists(mainPid) else "Main process interrupted!") if self.__visibility else None 
+            print("Time is up!" if pid_exists(mainPid) else "Main process interrupted!") if self.visibility else None 
             
             process.suspend()
-            self.run_function()
+            self._run_function(self.target, self.args, self.visibility)
             process.resume()
             # Stop main process, run the function and resume the main process
         except Exception as e:
+            print(e) if self.visibility else None
             raise e
     
     def start(self) -> "HourGlass":
@@ -217,19 +218,19 @@ class HourGlass:
         Notes:
             - This method uses `freeze_support()` to ensure compatibility with Windows.
             - The hourglass process is started as a daemon process.
-            - If `self.__visibility` is `True`, it prints a message indicating that the hourglass has started.
+            - If `self.visibility` is `True`, it prints a message indicating that the hourglass has started.
         """
         from os import getpid
 
         freeze_support()
         # Freeze support for Windows
 
-        if self.is_active():
+        if self.status:
             raise RuntimeError(f"Hourglass already running!")
         else:
-            print("Starting hourglass!") if self.__visibility else None
+            print("Starting hourglass!") if self.visibility else None
 
-            process = Process(target=self._decrease_time, args=(getpid(),), daemon=True)
+            process = Process(target=self.__decrease_time, args=(getpid(),), daemon=True)
             process.start()
             # Start the parallel process
 
@@ -250,18 +251,19 @@ class HourGlass:
 
         Notes:
             - The method checks if the hourglass process ID is set and if the process exists.
-            - If `self.__visibility` is `True`, it prints a message indicating that the hourglass has stopped.
+            - If `self.visibility` is `True`, it prints a message indicating that the hourglass has stopped.
         """
-        if not self.is_active():
+        if not self.status:
             raise AttributeError(f"There is no hourglass running!")
         else:
             process = psProcess(self.__pid)
             process.terminate()
             self.__pid = None
             self.__process = None
-            if self.__visibility:
+            if self.visibility:
                 print("Hourglass stopped!")
     
+    @property
     def remaining_time(self) -> timedelta:
         """
         Show the remaining time in `timedelta` format (HH:MM:SS.ms).
@@ -276,16 +278,17 @@ class HourGlass:
             AttributeError: If no hourglass process is currently running.
 
         Notes:
-            - If `self.__visibility` is `True`, it prints the remaining time.
+            - If `self.visibility` is `True`, it prints the remaining time.
             - The remaining time is formatted as a `timedelta` object.
         """
-        if not self.is_active():
+        if not self.status:
             raise AttributeError(f"There is no hourglass running!")
         else:
             val = self._time_format(self.__total_time.value)
-            print(f"Remaining time: {str(val)}") if self.__visibility else None  
+            print(f"Remaining time: {str(val)}") if self.visibility else None  
             return val
     
+    @property
     def remaining_seconds(self) -> Union[int, float]:
         """
         Show the remaining time in seconds.
@@ -299,12 +302,13 @@ class HourGlass:
         Raises:
             AttributeError: If no hourglass process is currently running.
         """
-        if not self.is_active():
+        if not self.status:
             raise AttributeError(f"There is no hourglass running!")
         else:
             return self.__total_time.value
 
-    def get_pid(self) -> int:
+    @property
+    def pid(self) -> int:
         """
         Return the process ID of the running hourglass.
 
@@ -317,12 +321,13 @@ class HourGlass:
         Raises:
             AttributeError: If no hourglass process is currently running.
         """
-        if not self.is_active():
+        if not self.status:
             raise AttributeError(f"There is no hourglass running!")
         else:
             return int(self.__pid)
     
-    def is_active(self) -> bool:
+    @property
+    def status(self) -> bool:
         """
         Check if the hourglass is active.
 
@@ -346,7 +351,7 @@ class HourGlass:
         Notes:
             - The method uses the `join()` method of the alarm process.
         """
-        if self.is_active():
+        if self.status:
             self.__process.join()
         else:
             raise RuntimeError("Alarm not set!")
