@@ -71,7 +71,7 @@ The Alarm class takes a list of times and a function. When the algorithm identif
 ```python
 from ptymer import Alarm
 
-alarm = Alarm(target=target, args=(), schedules=["10:49:00"], visibility=True).start()
+alarm = Alarm(schedules=["10:49:00"], target=target, args=(), visibility=True).start()
 ```
 
 <br></br>
@@ -90,11 +90,12 @@ def foo():
 if __name__ == '__main__':
     foo()
 ```
-You can find more information about this issue [here]().
+You can find more information about this issue [here](https://github.com/hyskoniho/ptymer/wiki/Handling-Parallelism).
 
 ## Contribution
 Contributions are welcome!!! Feel free to open issues and pull requests on the GitHub repository.
-Pay attention to [test files](https://github.com/hyskoniho/ptymer/tree/main/tests) content and don't forget to document every change!
+Pay attention to the [test files](https://github.com/hyskoniho/ptymer/tree/main/tests) content and don't forget to document every change!
+We use Pytest and there's a [workflow](https://github.com/hyskoniho/ptymer/blob/main/.github/workflows/unit_test.yaml) set up on GitHub Actions that you might want to check out.
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](https://github.com/hyskoniho/ptymer/blob/main/LICENSE) file for more details.
