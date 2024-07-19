@@ -4,7 +4,37 @@ sys.path.insert(1, r'.\src')
 from ptymer import Timer
 from random import randint
 
+@Timer(visibility=True)
+def brk_heap_sort(arr):
+    def heapify(arr, n, i):
+        largest = i
+        left = 2 * i + 1
+        right = 2 * i + 2
+
+        if left < n and arr[largest] < arr[left]:
+            largest = left
+
+        if right < n and arr[largest] < arr[right]:
+            largest = right
+
+        if largest != i:
+            arr[i], arr[largest] = arr[largest], arr[i]
+            heapify(arr, n, largest)
+
+    n = len(arr)
+
+    # Build a maxheap
+    for i in range(n // 2 - 1, -1, -1):
+        heapify(arr, n, i)
+
+    # One by one extract elements
+    for i in range(n - 1, 0, -1):
+        arr[i], arr[0] = arr[0, arr[i]]  # Swap
+        heapify(arr, i, 0)
+
+    return arr
 # Some hypothetical sorting functions
+@Timer(visibility=True)
 def quick_sort(arr):
     if len(arr) <= 1:
         return arr
@@ -139,35 +169,35 @@ def shell_sort(arr):
 # List of data to be sorted
 data = [randint(1,1000) for x in range(0,10000)]
 
-# Instantiating the Timer
-with Timer(visibility=True) as comparison_timer:
-    # Testing quick sort
-    a= quick_sort(data.copy())
-    comparison_timer.mark(observ="QuickSort")
+# Testing quick sort
+a= quick_sort(data.copy())
 
-    # Testing bubble sort
-    b= bubble_sort(data.copy())
-    comparison_timer.mark(observ="BubbleSort")
+a1 = brk_heap_sort(data.copy())
 
-    # Testing heap sort
-    c= heap_sort(data.copy())
-    comparison_timer.mark(observ="HeapSort")
 
-    # Testing merge sort
-    d= merge_sort(data.copy())
-    comparison_timer.mark(observ="MergeSort")
+# Testing bubble sort
+b= bubble_sort(data.copy())
 
-    # Testing insertion sort
-    e= insertion_sort(data.copy())
-    comparison_timer.mark(observ="InsertionSort")
 
-    # Testing selection sort
-    f= selection_sort(data.copy())
-    comparison_timer.mark(observ="SelectionSort")
+# Testing heap sort
+c= heap_sort(data.copy())
 
-    # Testing shell sort
-    g= shell_sort(data.copy())
-    comparison_timer.mark(observ="ShellSort")
+
+# Testing merge sort
+d= merge_sort(data.copy())
+
+
+# Testing insertion sort
+e= insertion_sort(data.copy())
+
+
+# Testing selection sort
+f= selection_sort(data.copy())
+
+
+# Testing shell sort
+g= shell_sort(data.copy())
+
 
 print(a == b == c == d == e == f == g) # Confirm if all the results are the same
 

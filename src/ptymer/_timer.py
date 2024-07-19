@@ -16,10 +16,13 @@ class Timer(ContextDecorator):
         Notes:
             - Initializes `self.__start_time` as `None`.
             - Initializes `self.__marks` as an empty list of lists.
+            - Initializes `self.__depth_meter` as 0.
             - Raises an error if `visibility` is not a boolean.
         """
         self.__start_time: Optional[datetime] = None
         self.__marks: list[list[timedelta, Optional[str]]] = []
+        self.__depth_meter: int = 0
+
         if not isinstance(visibility, bool):
             raise TypeError("Visibility must be a boolean!")
         else: self.visibility: bool = visibility
@@ -31,16 +34,15 @@ class Timer(ContextDecorator):
         """
         Start a new timer as a context manager.
 
-        Raises:
-            RuntimeError: If the timer is already executing.
-
         Returns:
             Timer: The Timer instance itself.
+        
+        Notes:
+            - Checks the depth of the recursion and starts the timer if it is the first call.
         """
-        if self.status:
-            raise RuntimeError(f"Timer already executing!")
-        else:
+        if self.__depth_meter == 0:
             self.start()
+        self.__depth_meter += 1
         return self
 
     def __exit__(self, exc_type: Optional[Exception], exc_value: Optional[str], traceback: str) -> None:
@@ -59,12 +61,16 @@ class Timer(ContextDecorator):
         Notes:
             - If no exception occurred (`exc_type` is `None`), the timer is stopped.
         """
+        self.__depth_meter -= 1
+        if self.__depth_meter == 0:
+            if not self.status:
+                raise AttributeError("There is no timer executing!")
+            else:
+                self.stop()
+        elif self.__depth_meter < 0 and self.visibility:
+            print('Warning: Timer was stopped more times than it was started!')
         if exc_type:
-            raise exc_type(exc_value)
-        elif not self.status:
-            raise AttributeError(f"There is no timer executing!")
-        else:
-            self.stop()
+            raise exc_type(exc_value).with_traceback(traceback)
         
     def __eq__(self, other: "Timer") -> bool:
         if isinstance(other, Timer):
@@ -141,8 +147,9 @@ class Timer(ContextDecorator):
                 print(f"Total elapsed time: {str(end_time)}")
                 if len(self.__marks) > 0:
                     print("Marks:")
-                    [print(f"{x+1}: {mark[0]}" + "\t" + f"{mark[1]}") for x, mark in enumerate(self.__marks)]
+                    [print(f"{x+1}: {mark[0]}"  + "\t" + f"{mark[1]}") for x, mark in enumerate(self.__marks)]
 
+            self.__depth_meter = 0 # Reset the depth meter, for the case of using the timer as a context manager and it was stopped before the end of the block for some dark reason
             return end_time
         
     def restart(self) -> None:
