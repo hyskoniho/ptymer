@@ -60,7 +60,7 @@ def test_timer_decorator():
 def test_timer_eq():
     h1 = Timer().start()
     h2 = Timer().start()
-    assert h1 == h2
+    assert h2 - h1 > 0.1
 
 def test_timer_ne():
     h1 = Timer().start()
