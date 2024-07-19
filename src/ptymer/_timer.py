@@ -28,7 +28,7 @@ class Timer(ContextDecorator):
         else: self.visibility: bool = visibility
 
     def __str__(self) -> str:
-        return f"Class Timer()\nVisibility: {self.visibility}\nActive: {self.status}\nStart time: {str(self.__start_time)}\nTime since start: {str(self.current_time())}\nQuantity of marks: {len(self.__marks)}\n"
+        return f"Class Timer()\nVisibility: {self.visibility}\nActive: {self.status}\nStart time: {str(self.__start_time)}\nTime since start: {str(self.current_time)}\nQuantity of marks: {len(self.__marks)}\n"
     
     def __enter__(self) -> "Timer":
         """
@@ -173,6 +173,7 @@ class Timer(ContextDecorator):
             self.__start_time = now
             self.__marks = []
     
+    @property
     def current_time(self) -> timedelta:
         """
         Return the current elapsed time of the timer from the start time.
@@ -210,8 +211,8 @@ class Timer(ContextDecorator):
             raise AttributeError(f"There is no timer executing!")
         else:
             if self.visibility:
-                print(f"Mark {len(self.__marks)+1}! \nTime since the beginning: \t{str(self.current_time())}" + (f"\nTime since previous mark: \t{self.current_time()-self.__marks[-1][0]}" if len(self.__marks) > 0 else "") + (f"\nObs: {observ}" if observ else ""))
-            self.__marks.append([self.current_time(), observ if observ else ""])
+                print(f"Mark {len(self.__marks)+1}! \nTime since the beginning: \t{str(self.current_time)}" + (f"\nTime since previous mark: \t{self.current_time-self.__marks[-1][0]}" if len(self.__marks) > 0 else "") + (f"\nObs: {observ}" if observ else ""))
+            self.__marks.append([self.current_time, observ if observ else ""])
 
     @property
     def marks(self) -> Dict[int, Tuple[str, timedelta]]:

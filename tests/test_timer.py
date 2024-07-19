@@ -43,7 +43,7 @@ def test_timer_mark():
 def test_timer_current_time():
     timer = Timer()
     timer.start()
-    assert isinstance(timer.current_time(), timedelta)
+    assert isinstance(timer.current_time, timedelta)
 
 def test_timer_context_manager():
     with Timer() as t:
