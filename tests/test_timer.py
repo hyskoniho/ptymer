@@ -107,3 +107,49 @@ def test_error_if_timer_not_started():
     timer = Timer()
     with pytest.raises(RuntimeError):
         timer.stop()
+
+def test_error_mark_not_started():
+    timer = Timer()
+    with pytest.raises(RuntimeError):
+        timer.mark("Test mark")
+
+def test_error_current_time_not_started():
+    timer = Timer()
+    with pytest.raises(RuntimeError):
+        print(timer.current_time)
+
+def test_timer_error_eq():
+    h1 = Timer().start()
+    h2 = 777
+    with pytest.raises(TypeError):
+        h1 == h2
+
+def test_timer_error_ne():
+    h1 = Timer().start()
+    h2 = 777
+    with pytest.raises(TypeError):
+        h1 != h2
+
+def test_timer_error_lt():
+    h1 = Timer().start()
+    h2 = 777
+    with pytest.raises(TypeError):
+        h1 < h2
+
+def test_timer_error_le():
+    h1 = Timer().start()
+    h2 = 777
+    with pytest.raises(TypeError):
+        h1 <= h2
+
+def test_timer_error_gt():
+    h2 = 777
+    h1 = Timer().start()
+    with pytest.raises(TypeError):
+        h1 > h2
+
+def test_timer_error_ge():
+    h2 = 777
+    h1 = Timer().start()
+    with pytest.raises(TypeError):
+        h1 >= h2

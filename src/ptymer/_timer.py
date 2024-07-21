@@ -182,14 +182,14 @@ class Timer(ContextDecorator):
             timedelta: The current elapsed time in `HH:MM:SS.ms` format.
 
         Raises:
-            AttributeError: If there is no timer currently executing.
+            RuntimeError: If there is no timer currently executing.
 
         Notes:
             - Calculates the elapsed time from `self.__start_time` to the current time.
             - Returns the formatted time using `_time_format` method.
         """
         if not self.status:
-            raise AttributeError(f"There is no timer executing!")
+            raise RuntimeError(f"There is no timer executing!")
         else:
             return datetime.now() - self.__start_time
     
@@ -201,14 +201,14 @@ class Timer(ContextDecorator):
             observ (str, optional): An optional observation associated with the mark.
 
         Raises:
-            AttributeError: If there is no timer currently executing.
+            RuntimeError: If there is no timer currently executing.
 
         Notes:
             - Adds a new mark to `self.__marks` consisting of the current time and the observation.
             - If `self.visibility` is `True`, prints the mark number, current time, and observation.
         """
         if not self.status:
-            raise AttributeError(f"There is no timer executing!")
+            raise RuntimeError(f"There is no timer executing!")
         else:
             if self.visibility:
                 print(f"Mark {len(self.__marks)+1}! \nTime since the beginning: \t{str(self.current_time)}" + (f"\nTime since previous mark: \t{self.current_time-self.__marks[-1][0]}" if len(self.__marks) > 0 else "") + (f"\nObs: {observ}" if observ else ""))

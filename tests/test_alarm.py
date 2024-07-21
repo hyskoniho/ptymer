@@ -72,3 +72,13 @@ def test_error_alarm_not_started():
     a = Alarm([datetime.now() + timedelta(seconds=2)])
     with pytest.raises(RuntimeError):
         a.stop()
+
+def test_error_alarm_pid():
+    a = Alarm([datetime.now() + timedelta(seconds=2)])
+    with pytest.raises(AttributeError):
+        assert a.pid is None
+
+def test_error_alarm_wait():
+    a = Alarm([datetime.now() + timedelta(seconds=2)])
+    with pytest.raises(RuntimeError):
+        a.wait()

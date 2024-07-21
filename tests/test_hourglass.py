@@ -114,3 +114,49 @@ def test_error_if_hourglass_not_started():
     h = HourGlass(5)
     with pytest.raises(RuntimeError):
         h.stop()
+
+def test_error_pid():
+    h = HourGlass(1)
+    with pytest.raises(AttributeError):
+        assert h.pid is None
+
+def test_error_wait():
+    h = HourGlass(1)
+    with pytest.raises(RuntimeError):
+        h.wait()
+
+def test_hourglass_error_eq():
+    h1 = HourGlass(1).start()
+    h2 = 777
+    with pytest.raises(TypeError):
+        h1 == h2
+
+def test_hourglass_error_ne():
+    h1 = HourGlass(1).start()
+    h2 = 777
+    with pytest.raises(TypeError):
+        h1 != h2
+
+def test_hourglass_error_lt():
+    h1 = HourGlass(1).start()
+    h2 = 777
+    with pytest.raises(TypeError):
+        h1 < h2
+
+def test_hourglass_error_le():
+    h1 = HourGlass(1).start()
+    h2 = 777
+    with pytest.raises(TypeError):
+        h1 <= h2
+
+def test_hourglass_error_gt():
+    h2 = 777
+    h1 = HourGlass(1).start()
+    with pytest.raises(TypeError):
+        h1 > h2
+
+def test_hourglass_error_ge():
+    h2 = 777
+    h1 = HourGlass(1).start()
+    with pytest.raises(TypeError):
+        h1 >= h2
