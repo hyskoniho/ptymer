@@ -1,11 +1,12 @@
 <div align="center">
   <h1>PTymer ⏱️</h1>
+  <br></br>
   <img src="https://img.shields.io/badge/core-python-%2314354C.svg?style=for-the-badge">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="https://img.shields.io/badge/status-online-green?style=for-the-badge">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="https://img.shields.io/badge/license-MIT-yellow?style=for-the-badge">
 </div>
 
-**PTymer** is a Python project that provides insights and actions within the execution of code in a time context. This package includes three main classes: `Timer`, `HourGlass`, and `Alarm`, each with specific functionalities for time monitoring and control. You can find the full description in the [Wiki Page](https://github.com/hyskoniho/ptymer/wiki)
+**PTymer** is a Python project that provides insights and actions within the execution of code in a time context. This package includes three main classes: `Timer`, `HourGlass`, and `Alarm`, each with specific functionalities for time monitoring and control. You can find the full description in the [Wiki Page](https://github.com/hyskoniho/ptymer/wiki).
 
 ## Index
 
@@ -16,11 +17,10 @@
   - [Alarm](#alarm)
 - [Contribution](#contribution)
 - [License](#license)
-
+- 
 ## Installation
 
-PTymer is compatible with Python 3.8 or higher. 
-To install, use pip:
+PTymer is compatible with Python 3.8 and later versions, and is officially available on [PyPI](https://pypi.org/project/ptymer/). You can install it using pip:
 
 ```bash
 pip install ptymer
