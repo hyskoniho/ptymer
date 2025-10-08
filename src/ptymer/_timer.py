@@ -119,7 +119,7 @@ class Timer(ContextDecorator):
             raise RuntimeError(f"Timer already executing!")
         else:
             self.__start_time = datetime.now()
-            print(f"Starting timer!") if self.visibility else None
+            print(f"Starting timer at {str(self.__start_time)}!") if self.visibility else None
             return self
     
     def stop(self) -> timedelta:
@@ -211,7 +211,7 @@ class Timer(ContextDecorator):
             raise RuntimeError(f"There is no timer executing!")
         else:
             if self.visibility:
-                print(f"Mark {len(self.__marks)+1}! \nTime since the beginning: \t{str(self.current_time)}" + (f"\nTime since previous mark: \t{self.current_time-self.__marks[-1][0]}" if len(self.__marks) > 0 else "") + (f"\nObs: {observ}" if observ else ""))
+                print(f"Mark {len(self.__marks)+1}! \nCurrent time: {str(self.current_time)} \nTime since the beginning: \t{str(self.current_time)}" + (f"\nTime since previous mark: \t{self.current_time-self.__marks[-1][0]}" if len(self.__marks) > 0 else "") + (f"\nObs: {observ}" if observ else ""))
             self.__marks.append([self.current_time, observ if observ else ""])
 
     @property
