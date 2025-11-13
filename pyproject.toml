@@ -27,3 +27,6 @@ dependencies = [
 Homepage = "https://github.com/hyskoniho/ptymer"
 Documentation = "https://github.com/hyskoniho/ptymer/wiki"
 Issues = "https://github.com/hyskoniho/ptymer/issues"
+
+[project.scripts]
+ptymercli = "ptymer_cli.cli:main"
