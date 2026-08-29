@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.projectile
 
 # C extensions
 *.so
@@ -168,3 +169,12 @@ cython_debug/
 .venv38/
 .venv312/
 # Folder for testing virtual environments
+
+# emacs / projectile package
+.projectile
+
+# LSP Server pyright config files.
+pyrightconfig.json
+
+# File with commit message
+commit_message.txt
