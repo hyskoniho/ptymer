@@ -1,0 +1,77 @@
+name: Rebase Test Branch
+
+on:
+  push:
+    branches:
+      - main
+  workflow_run:
+    workflows: ["Release Pipeline"]
+    types:
+      - completed
+  workflow_dispatch:
+
+concurrency:
+  group: rebase-test-branch
+  cancel-in-progress: false
+
+jobs:
+  rebase:
+    name: Rebase test onto main
+    runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Rebase test onto main and push
+        run: |
+          set -e
+
+          # Check if remote 'test' branch exists
+          if ! git ls-remote --exit-code --heads origin test > /dev/null 2>&1; then
+            echo "Remote branch 'test' does not exist. Nothing to rebase."
+            exit 0
+          fi
+
+          echo "=== Fetching latest main and test branches ==="
+          git fetch origin +refs/heads/main:refs/remotes/origin/main +refs/heads/test:refs/remotes/origin/test
+
+          echo "=== Switching to local 'test' branch ==="
+          git checkout -B test origin/test
+
+          echo "=== Checking if rebase is needed ==="
+          if git merge-base --is-ancestor origin/main test; then
+            echo "Branch 'test' is already up to date with 'main'. Nothing to rebase."
+            exit 0
+          fi
+
+          echo "=== Rebasing 'test' onto 'origin/main' ==="
+          if ! git rebase --empty=drop origin/main; then
+            echo "::error::Rebase failed due to merge conflicts between 'origin/main' and 'test'."
+            echo "::error::Please resolve the conflicts manually on the 'test' branch."
+            git rebase --abort
+            exit 1
+          fi
+
+          LOCAL_SHA=$(git rev-parse test)
+          REMOTE_SHA=$(git rev-parse origin/test)
+
+          if [ "$LOCAL_SHA" = "$REMOTE_SHA" ]; then
+            echo "Branch 'test' commit SHA matches remote. No push needed."
+            exit 0
+          fi
+
+          echo "=== Pushing rebased 'test' branch to origin ==="
+          # Pushes authenticated via GITHUB_TOKEN intentionally do not trigger downstream workflows
+          git push --force-with-lease origin test
