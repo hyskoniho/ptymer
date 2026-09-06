@@ -1,0 +1,28 @@
+name: Publish to TestPyPI
+
+on:
+  push:
+    branches:
+      - test
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]'
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/ptymer 
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Python Semantic Release
+        uses: python-semantic-release/python-semantic-release@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/

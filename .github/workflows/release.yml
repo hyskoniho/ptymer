@@ -1,0 +1,26 @@
+name: Release Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/ptymer
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 
+
+      - name: Python Semantic Release
+        uses: python-semantic-release/python-semantic-release@v4 
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
