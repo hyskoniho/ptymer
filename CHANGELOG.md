@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.1.0 (2026-09-07)
+
+### Features
+
+- Enhance release workflows for PyPI and TestPyPI publishing
+  ([`59c22f7`](https://github.com/hyskoniho/ptymer/commit/59c22f771a9551b027f1e43d716bd7c0edacf6c2))
+
+
 ## v1.0.0 (2026-09-06)
 
 ### Bug Fixes
