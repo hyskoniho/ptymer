@@ -27,23 +27,23 @@ class Alarm():
         Post-initialization method.
 
         This method validates the attributes and converts string representations of dates 
-        to `datetime` objects. It ensures that the schedules, target function, arguments, 
+        to **datetime** objects. It ensures that the schedules, target function, arguments, 
         and other attributes are correctly defined and of the proper types.
 
-        Raises:
-            TypeError: If `schedules` is not a list, if `target` is not a callable function, 
+        ## **Raises**:
+            `TypeError`: If `schedules` is not a list, if `target` is not a callable function, 
                     if `args` is not a tuple, if `visibility` is not a boolean, if `keep_schedules` 
                     is not a boolean, or if any schedule entry is not a valid date.
-            ValueError: If `schedules` is empty, if `target` is not defined, or if `args` 
+            `ValueError`: If `schedules` is empty, if `target` is not defined, or if `args` 
                         are defined without a target function.
 
-        Notes:
-            - `schedules` should be a list of dates in `datetime`, `tuple`, or `str` format.
+        ## **Notes**:
+            - `schedules` should be a list of dates in **datetime**, **tuple**, or **str** format.
             - `target` should be a callable function.
             - `args` should be a tuple of arguments for the target function.
             - `visibility` and `keep_schedules` should be boolean values.
-            - The method converts string dates to `datetime` objects and tuple dates to 
-            `datetime` objects, truncating microseconds for `datetime` objects.
+            - The method converts string dates to **datetime** objects and tuple dates to 
+            **datetime** objects, truncating microseconds for **datetime** objects.
         """
         if not isinstance(self.schedules, list):
             raise TypeError("Schedules must be a list!")
@@ -86,14 +86,14 @@ class Alarm():
         This method initializes and starts the alarm process. It checks if an alarm is already set and 
         raises an error if so. Otherwise, it starts a new alarm process that runs in the background.
 
-        Returns:
-            Alarm: The current instance of the `Alarm` class.
+        ## **Returns**:
+            `Alarm`: The current instance of the **Alarm** class.
 
-        Raises:
-            ValueError: If an alarm is already set.
+        ## **Raises**:
+            `ValueError`: If an alarm is already set.
 
-        Notes:
-            - This method uses `freeze_support()` to ensure compatibility with Windows.
+        ## **Notes**:
+            - This method uses **freeze_support()** to ensure compatibility with Windows.
             - The alarm process is started as a daemon process.
         """
         from os import getpid
@@ -113,23 +113,22 @@ class Alarm():
             return self
         
     @staticmethod
-    def _run_function(target, args, visibility) -> any:
+    def _run_function(target, args, visibility) -> Any:
         """
         Execute the stored function with its arguments.
 
-        This method attempts to run the function stored in `self.target` with the arguments stored in `self.args`.
+        This method attempts to run the function stored in **self.target** with the arguments stored in **self.args**.
         If no arguments are provided, the function is called without arguments.
 
-        Returns:
-            any: The return value of the executed function, or `None` if no function is stored. If an exception occurs, 
-            it returns the exception message as a string.
+        ## **Returns**:
+            `Any`: The return value of the executed function, or **None** if no function is stored. If an exception occurs, it returns the exception message as a string.
 
-        Raises:
-            Exception: If an error occurs during the function execution, the exception is caught and its message is printed
+        ## **Raises**:
+            `Exception`: If an error occurs during the function execution, the exception is caught and its message is printed.
 
-        Notes:
-            - If `self.target` is `None`, the method returns `None`.
-            - If `self.args` is `None`, the function is called without arguments.
+        ## **Notes**:
+            - If `target` is **None**, the method returns **None**.
+            - If `args` is **None**, the function is called without arguments.
         """
         try:
             if target and args:
@@ -151,19 +150,19 @@ class Alarm():
         This function monitors the schedules and triggers the alarm at the specified times.
         It suspends and resumes the main process around the execution of the alarm function.
 
-        Args:
-            mainPid (int): The process ID of the main process to be monitored.
+        ## **Args**:
+            `mainPid`: The process ID of the main process to be monitored.
 
-        Returns:
-            None
+        ## **Returns**:
+            `None`
 
-        Raises:
-            ValueError: If `mainPid` is not a valid process ID.
+        ## **Raises**:
+            `ValueError`: If **mainPid** is not a valid process ID.
 
-        Notes:
+        ## **Notes**:
             - The function continuously checks the current time against scheduled alarm times.
             - When the current time matches a scheduled time, the main process is suspended, the alarm function is executed, and then the main process is resumed.
-            - If `self.keep_schedules` is `False`, the schedule is removed after the alarm is triggered.
+            - If **self.keep_schedules** is **False**, the schedule is removed after the alarm is triggered.
             - The function stops running when there are no more schedules or if the main process no longer exists.
         """
         process = psProcess(mainPid)
@@ -195,12 +194,12 @@ class Alarm():
         This method terminates the alarm process if it is currently running. If no alarm is set,
         it raises an error.
 
-        Raises:
-            RuntimeError: If no alarm is currently set.
+        ## **Raises**:
+            `RuntimeError`: If no alarm is currently set.
 
-        Notes:
+        ## **Notes**:
             - The method checks if the alarm process exists and terminates it if so.
-            - If `self.visibility` is `True`, it prints a message indicating that the alarm has stopped.
+            - If **self.visibility** is **True**, it prints a message indicating that the alarm has stopped.
         """
         if self.status:
             process = psProcess(self.__pid)
@@ -220,13 +219,13 @@ class Alarm():
         This method returns the process ID of the running alarm process. If no alarm process 
         is running, it raises an error.
 
-        Returns:
-            int: The process ID of the running alarm.
+        ## **Returns**:
+            `int`: The process ID of the running alarm.
 
-        Raises:
-            AttributeError: If no alarm process is currently running.
+        ## **Raises**:
+            `AttributeError`: If no alarm process is currently running.
 
-        Notes:
+        ## **Notes**:
             - The method checks if the alarm process ID is set and if the process exists.
         """
         if not self.status:
@@ -240,11 +239,11 @@ class Alarm():
         Check if the alarm is active.
 
         This method checks if the alarm process is currently running.
+        
+        ## **Returns**:
+            `bool`: **True** if the alarm process is active, **False** otherwise.
 
-        Returns:
-            bool: `True` if the alarm process is active, `False` otherwise.
-
-        Notes:
+        ## **Notes**:
             - The method checks if the process ID is set and if the process exists.
         """
         if self.__pid and pid_exists(self.__pid):
@@ -258,11 +257,11 @@ class Alarm():
 
         This method waits for the alarm process to finish before returning.
 
-        Returns:
-            None
+        ## **Returns**:
+            `None`
 
-        Notes:
-            - The method uses the `join()` method of the alarm process.
+        ## **Notes**:
+            - The method uses the **join()** method of the alarm process.
         """
         if self.status:
             self.__process.join()

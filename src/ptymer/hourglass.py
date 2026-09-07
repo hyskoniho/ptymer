@@ -1,7 +1,8 @@
-from typing import Callable, Optional, Union
-from multiprocessing import Process, Value, freeze_support
+# Built-in modules
 from datetime import timedelta
+from typing import Callable, Optional, Union, Any
 from psutil import Process as psProcess, pid_exists
+from multiprocessing import Process, Value, freeze_support
 
 class HourGlass:
     def __init__(self, 
@@ -10,23 +11,22 @@ class HourGlass:
                  args: Optional[tuple] = None,
                  visibility: bool = False) -> None:
         """
-        Initialize the hourglass timer.
+        Initialize the hourglass countdown timer.
+    
+        ## **Args**:
+            `seconds`: The duration of the countdown timer in seconds. Must be a positive number.
+            `target`: A callable function to be executed when the timer ends. Default is None.
+            `args`: A tuple of arguments to pass to the target function. Default is None.
+            `visibility`: Determines if messages should be displayed. Default is False.
 
-        Args:
-            seconds (Union[int, float]): The duration of the timer in seconds. Must be a positive number.
-            target (Optional[Callable]): A callable function to be executed when the timer ends. Default is None.
-            args (Optional[tuple]): A tuple of arguments to pass to the target function. Default is None.
-            visibility (bool): Determines if messages should be displayed. Default is False.
+        ## **Raises**:
+            `TypeError`: If **visibility** is not a boolean, if **seconds** is not numeric, if **target** is not a callable or if **args** is not a tuple.
+            `ValueError`: If **seconds** is less than 1, or if **args** are defined without a target function.
 
-        Raises:
-            TypeError: If `visibility` is not a boolean, if `seconds` is not numeric, if `target` is not a callable or if `args` is not a tuple.
-            ValueError: If `seconds` is less than 1, or if `args` are defined without a target function.
-
-        Notes:
+        ## **Notes**:
             - The `visibility` attribute defines if the hourglass will show messages or not.
             - The `seconds` attribute represents the total time of the hourglass.
-            - The `__pid` attribute stores the process ID of the hourglass.
-            - The `__process` attribute stores the process of the hourglass.
+            - The `pid` attribute stores the process ID of the hourglass.
             - The `target` attribute is the function to be executed when the timer ends.
             - The `args` attribute contains the arguments for the `target` function.
         """
@@ -107,18 +107,17 @@ class HourGlass:
         This method takes a number of seconds and converts it to a `timedelta` object, 
         representing the equivalent hours, minutes, and seconds.
 
-        Args:
-            secs (Union[int, float]): The number of seconds to convert.
+        ## **Args**:
+            `secs`: The number of seconds to convert.
 
-        Returns:
-            timedelta: A `timedelta` object representing the equivalent time.
+        ## **Returns**:
+            `timedelta`: A **timedelta** object representing the equivalent time.
 
-        Raises:
-            ValueError: If the provided seconds cannot be converted to a valid time.
+        ## **Raises**:
+            `ValueError`: If the provided seconds cannot be converted to a valid time.
 
-        Notes:
+        ## **Notes**:
             - The input `secs` can be either an integer or a float.
-            - The method prints the intermediate time string for debugging purposes.
             - The time is formatted to include hours, minutes, and seconds with two decimal places for seconds.
         """
         mins, secs = divmod(secs, 60)
@@ -128,24 +127,22 @@ class HourGlass:
         return timedelta(days=days, hours=hours, minutes=mins, seconds=secs)
     
     @staticmethod
-    def _run_function(target, args, visibility) -> any:
+    def _run_function(target, args, visibility) -> Any:
         """
         Execute the stored function with its arguments.
 
-        This method attempts to run the function stored in `self.target` with the arguments stored in `self.args`.
+        This method attempts to run the function stored in **self.target** with the arguments stored in **self.args**.
         If no arguments are provided, the function is called without arguments.
 
-        Returns:
-            any: The return value of the executed function, or `None` if no function is stored. If an exception occurs, 
-            it returns the exception message as a string.
+        ## **Returns**:
+            `Any`: The return value of the executed function, or **None** if no function is stored. If an exception occurs, it returns the exception message as a string.
 
-        Raises:
-            Exception: If an error occurs during the function execution, the exception is caught and its message is printed
-            if `self.visibility` is `True`.
+        ## **Raises**:
+            `Exception`: If an error occurs during the function execution, the exception is caught and its message is printed.
 
-        Notes:
-            - If `target` is `None`, the method returns `None`.
-            - If `args` is `None`, the function is called without arguments.
+        ## **Notes**:
+            - If `target` is **None**, the method returns **None**.
+            - If `args` is **None**, the function is called without arguments.
         """
         try:
             if target and args:
@@ -165,20 +162,20 @@ class HourGlass:
         Decrease the timer by 1 second increments.
 
         This method decreases the timer by 1 second at a time until the timer reaches zero or 
-        the main process (identified by `mainPid`) is no longer running. When the timer ends 
+        the main process (identified by **mainPid**) is no longer running. When the timer ends 
         or the main process is interrupted, it runs the specified function and resumes the 
         main process.
 
-        Args:
-            mainPid (int): The process ID of the main process.
+        ## **Args**:
+            `mainPid`: The process ID of the main process.
 
-        Raises:
-            Exception: If any error occurs during the process.
+        ## **Raises**:
+            `Exception`: If any error occurs during the process.
 
-        Notes:
-            - This method uses `sleep(1)` to wait for 1 second intervals between decreases.
+        ## **Notes**:
+            - This method uses **sleep(1)** to wait for 1 second intervals between decreases.
             - If the timer runs out or the main process is interrupted, it prints a message if 
-            `self.visibility` is `True`.
+            **self.visibility** is **True**.
             - The method suspends the main process, runs the target function, and then resumes the main process.
         """
         from time import sleep
@@ -203,22 +200,22 @@ class HourGlass:
     
     def start(self) -> "HourGlass":
         """
-        Start the hourglass and return the `HourGlass` object.
+        Start the hourglass and return the **HourGlass** object.
 
         This method initializes and starts the hourglass timer. If an hourglass process is 
         already running, it raises an error. Otherwise, it starts a new process to run the 
         timer in the background.
 
-        Returns:
-            HourGlass: The current instance of the `HourGlass` class.
+        ## **Returns**:
+            `HourGlass`: The current instance of the **HourGlass** class.
 
-        Raises:
-            RuntimeError: If the hourglass is already running.
+        ## **Raises**:
+            `RuntimeError`: If the hourglass is already running.
 
-        Notes:
-            - This method uses `freeze_support()` to ensure compatibility with Windows.
+        ## **Notes**:
+            - This method uses **freeze_support()** to ensure compatibility with Windows.
             - The hourglass process is started as a daemon process.
-            - If `self.visibility` is `True`, it prints a message indicating that the hourglass has started.
+            - If **self.visibility** is **True**, it prints a message indicating that the hourglass has started.
         """
         from os import getpid
 
@@ -246,12 +243,12 @@ class HourGlass:
         This method terminates the running hourglass process. If no hourglass process is running,
         it raises an error.
 
-        Raises:
-            AttributeError: If no hourglass process is currently running.
+        ## **Raises**:
+            `AttributeError`: If no hourglass process is currently running.
 
-        Notes:
+        ## **Notes**:
             - The method checks if the hourglass process ID is set and if the process exists.
-            - If `self.visibility` is `True`, it prints a message indicating that the hourglass has stopped.
+            - If **self.visibility** is **True**, it prints a message indicating that the hourglass has stopped.
         """
         if not self.status:
             raise RuntimeError(f"There is no hourglass running!")
@@ -266,15 +263,15 @@ class HourGlass:
     @property
     def remaining_time(self) -> timedelta:
         """
-        Show the remaining time in `timedelta` format (HH:MM:SS.ms).
+        Show the remaining time in **timedelta** format (HH:MM:SS.ms).
 
-        This method returns the remaining time of the hourglass as a `timedelta` object.
+        This method returns the remaining time of the hourglass as a **timedelta** object.
 
-        Returns:
-            timedelta: The remaining time of the hourglass.
+        ## **Returns**:
+            `timedelta`: The remaining time of the hourglass.
 
-        Notes:
-            - The remaining time is formatted as a `timedelta` object.
+        ## **Notes**:
+            - The remaining time is formatted as a **timedelta** object.
         """
         val = self._time_format(self.__total_time.value) 
         return val
@@ -286,8 +283,8 @@ class HourGlass:
 
         This method returns the remaining time of the hourglass in seconds.
 
-        Returns:
-            int | float: The remaining time in seconds.
+        ## **Returns**:
+            `int` | `float`: The remaining time in seconds.
         """
         return self.__total_time.value
 
@@ -299,11 +296,11 @@ class HourGlass:
         This method returns the process ID of the hourglass if it is currently running. 
         If no hourglass process is running, it raises an error.
 
-        Returns:
-            int: The process ID of the running hourglass.
+        ## **Returns**:
+            `int`: The process ID of the running hourglass.
 
-        Raises:
-            AttributeError: If no hourglass process is currently running.
+        ## **Raises**:
+            `AttributeError`: If no hourglass process is currently running.
         """
         if not self.status:
             raise AttributeError(f"There is no hourglass running!")
@@ -318,8 +315,8 @@ class HourGlass:
         This method returns a boolean indicating whether the hourglass process is currently 
         active.
 
-        Returns:
-            bool: `True` if the hourglass process is active, `False` otherwise.
+        ## **Returns**:
+            `bool`: **True** if the hourglass process is active, **False** otherwise.
         """
         if self.__pid and pid_exists(self.__pid):
             return True
@@ -332,11 +329,11 @@ class HourGlass:
 
         This method waits for the hourglass process to finish before returning.
 
-        Returns:
-            None
+        ## **Returns**:
+            `None`
 
-        Notes:
-            - The method uses the `join()` method of the HourGlass process.
+        ## **Notes**:
+            - The method uses the **join()** method of the HourGlass process.
         """
         if self.status:
             self.__process.join()
