@@ -1,7 +1,7 @@
 # Built in libraries
 from contextlib import ContextDecorator
 from datetime import datetime, timedelta
-from typing import Optional, Dict, Tuple
+from typing import Optional, Dict, Tuple, List
 
 
 
@@ -23,7 +23,7 @@ class Timer(ContextDecorator):
             - Raises an error if `visibility` is not a boolean.
         """
         self.__start_time: Optional[datetime] = None
-        self.__marks: list[list[timedelta, Optional[str]]] = []
+        self.__marks: List[List[timedelta, str]] = []
         self.__depth_meter: int = 0
 
         if not isinstance(visibility, bool):
