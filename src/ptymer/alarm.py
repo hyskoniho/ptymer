@@ -1,9 +1,14 @@
+# Built in libraries
 from datetime import datetime
-from typing import Callable, Any, List, Tuple, Union, Optional
 from dataclasses import dataclass
+from multiprocessing import Process, freeze_support
+from typing import Callable, Any, List, Tuple, Union, Optional, Any
+
+# External packages
 from dateutil import parser
 from psutil import Process as psProcess, pid_exists
-from multiprocessing import Process, freeze_support
+
+
 
 @dataclass
 class Alarm():

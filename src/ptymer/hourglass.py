@@ -1,8 +1,12 @@
-# Built-in modules
+# Built-in libraries
 from datetime import timedelta
 from typing import Callable, Optional, Union, Any
-from psutil import Process as psProcess, pid_exists
 from multiprocessing import Process, Value, freeze_support
+
+# External packages
+from psutil import Process as psProcess, pid_exists
+
+
 
 class HourGlass:
     def __init__(self, 
