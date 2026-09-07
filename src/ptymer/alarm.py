@@ -143,7 +143,7 @@ class Alarm():
         else:
             return value
         
-    def _alarm_loop(self, mainPid: int) -> None:
+    def _alarm_loop(self, main_pid: int) -> None:
         """
         Run the alarm loop.
 
@@ -151,13 +151,13 @@ class Alarm():
         It suspends and resumes the main process around the execution of the alarm function.
 
         ## **Args**:
-            `mainPid`: The process ID of the main process to be monitored.
+            `main_pid`: The process ID of the main process to be monitored.
 
         ## **Returns**:
             `None`
 
         ## **Raises**:
-            `ValueError`: If **mainPid** is not a valid process ID.
+            `ValueError`: If **main_pid** is not a valid process ID.
 
         ## **Notes**:
             - The function continuously checks the current time against scheduled alarm times.
@@ -165,7 +165,7 @@ class Alarm():
             - If **self.keep_schedules** is **False**, the schedule is removed after the alarm is triggered.
             - The function stops running when there are no more schedules or if the main process no longer exists.
         """
-        process = psProcess(mainPid)
+        process = psProcess(main_pid)
         lastIdx = None
 
         while len(self.schedules) > 0:

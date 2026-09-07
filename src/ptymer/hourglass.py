@@ -157,17 +157,17 @@ class HourGlass:
         else:
             return value
     
-    def _decrease_time(self, mainPid: int) -> None:
+    def _decrease_time(self, main_pid: int) -> None:
         """
         Decrease the timer by 1 second increments.
 
         This method decreases the timer by 1 second at a time until the timer reaches zero or 
-        the main process (identified by **mainPid**) is no longer running. When the timer ends 
+        the main process (identified by **main_pid**) is no longer running. When the timer ends 
         or the main process is interrupted, it runs the specified function and resumes the 
         main process.
 
         ## **Args**:
-            `mainPid`: The process ID of the main process.
+            `main_pid`: The process ID of the main process.
 
         ## **Raises**:
             `Exception`: If any error occurs during the process.
@@ -180,7 +180,7 @@ class HourGlass:
         """
         from time import sleep
         try:
-            process = psProcess(mainPid)
+            process = psProcess(main_pid)
 
             while self.__total_time.value > 0:
                 self.__total_time.value-=1
@@ -188,7 +188,7 @@ class HourGlass:
             # Decrease time in 1 second and sleep for 1 second (main 
             # process is not interrupted)
 
-            print("Time is up!" if pid_exists(mainPid) else "Main process interrupted!") if self.visibility else None 
+            print("Time is up!" if pid_exists(main_pid) else "Main process interrupted!") if self.visibility else None 
             
             process.suspend()
             self._run_function(self.target, self.args, self.visibility)
