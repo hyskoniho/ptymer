@@ -11,7 +11,7 @@ class Timer(ContextDecorator):
         Initialize a Timer instance.
 
         ## **Args**:
-            ``visibility`: Determines if messages will be displayed. Defaults to False.
+            `visibility`: Determines if messages will be displayed. Defaults to False.
 
         ## **Raises**:
             `TypeError`: If visibility is not a boolean.
