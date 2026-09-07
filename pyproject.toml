@@ -32,10 +32,10 @@ Issues = "https://github.com/hyskoniho/ptymer/issues"
 ptymercli = "ptymer_cli.cli:main"
 
 [tool.semantic_release]
-version_variables = [
+version_toml = [
     "pyproject.toml:project.version",
 ]
 branch = "main"
-upload_to_pypi = true
+upload_to_pypi = false
 upload_to_release = true
 build_command = "pip install build && python -m build"
