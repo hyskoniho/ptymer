@@ -1,5 +1,5 @@
-from ._hourglass import HourGlass
-from ._timer import Timer
-from ._alarm import Alarm
+from .hourglass import HourGlass
+from .timer import Timer
+from .alarm import Alarm
 
 __all__ = ["HourGlass", "Timer", "Alarm"]
